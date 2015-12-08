@@ -39,6 +39,8 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    public static final String ACTION_LOGOUT = "com.smashingboxes.epa_prototype_android.ACTION_LOGOUT";
+
     /**
      * Id to identity READ_CONTACTS permission request.
      */
