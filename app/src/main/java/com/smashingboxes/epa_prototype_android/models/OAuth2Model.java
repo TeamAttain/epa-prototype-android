@@ -1,5 +1,7 @@
 package com.smashingboxes.epa_prototype_android.models;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Austin Lanier on 12/10/15.
  * Updated by
@@ -34,9 +36,14 @@ public class OAuth2Model {
         return refresh_token;
     }
 
+    public TimeUnit getExpirationTimeUnit(){
+        return TimeUnit.SECONDS;
+    }
+
     public boolean isExpired(){
-        long timeElapsedSinceCreation = System.currentTimeMillis() - created_at;
-        return timeElapsedSinceCreation > expires_in;
+        long convertedExpiresIn = TimeUnit.MILLISECONDS.convert(getExpiresIn(), getExpirationTimeUnit());
+        long timeElapsedSinceCreation = System.currentTimeMillis() - getCreatedAt();
+        return timeElapsedSinceCreation > convertedExpiresIn;
     }
 
 }
