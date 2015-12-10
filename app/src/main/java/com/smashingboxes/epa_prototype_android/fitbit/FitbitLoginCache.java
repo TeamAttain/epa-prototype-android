@@ -1,34 +1,35 @@
-package com.smashingboxes.epa_prototype_android.helpers;
+package com.smashingboxes.epa_prototype_android.fitbit;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
 import com.smashingboxes.epa_prototype_android.LoginActivity;
-import com.smashingboxes.epa_prototype_android.models.LoginModel;
+import com.smashingboxes.epa_prototype_android.helpers.PreferenceHelper;
+import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
 
 /**
  * Created by Austin Lanier on 12/8/15.
  */
-public class LoginCache {
+public class FitbitLoginCache {
 
-    private static final String TAG = LoginCache.class.getName();
+    private static final String TAG = FitbitLoginCache.class.getName();
 
     public static final String KEY_LOGGED_IN_MODEL = "com.smashingboxes.dudesolutions.KEY_LOGGED_IN_USER";
 
-    private static LoginCache mLoginCache;
+    private static FitbitLoginCache sMFitbitLoginCache;
 
-    private LoginModel loginModel;
-    private PreferenceHelper<LoginModel> mCacheHelper;
+    private FitbitAuthModel loginModel;
+    private PreferenceHelper<FitbitAuthModel> mCacheHelper;
 
-    public static synchronized LoginCache getInstance(Context context) {
-        if (mLoginCache == null) {
-            mLoginCache = new LoginCache(context.getApplicationContext());
+    public static synchronized FitbitLoginCache getInstance(Context context) {
+        if (sMFitbitLoginCache == null) {
+            sMFitbitLoginCache = new FitbitLoginCache(context.getApplicationContext());
         }
-        return mLoginCache;
+        return sMFitbitLoginCache;
     }
 
-    private LoginCache(Context context) {
+    private FitbitLoginCache(Context context) {
         mCacheHelper = new PreferenceHelper<>(context);
     }
 
@@ -37,7 +38,7 @@ public class LoginCache {
      *
      * @param loginModel - the login model to persist
      */
-    public void saveLoginModel(LoginModel loginModel) {
+    public void saveLoginModel(FitbitAuthModel loginModel) {
         mCacheHelper.persistObject(KEY_LOGGED_IN_MODEL, loginModel);
         this.loginModel = loginModel;
     }
@@ -47,9 +48,9 @@ public class LoginCache {
      *
      * @return the previous login model, or null if not present or an error occurred
      */
-    public LoginModel getLoginModel() {
+    public FitbitAuthModel getLoginModel() {
         if (loginModel == null) {
-            loginModel = mCacheHelper.getObject(KEY_LOGGED_IN_MODEL, LoginModel.class);
+            loginModel = mCacheHelper.getObject(KEY_LOGGED_IN_MODEL, FitbitAuthModel.class);
         }
         return loginModel;
     }
@@ -60,7 +61,7 @@ public class LoginCache {
     }
 
     public static void logout(Activity activity){
-        LoginCache.getInstance(activity).clearLogin();
+        FitbitLoginCache.getInstance(activity).clearLogin();
 
         Intent intent = new Intent(activity, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

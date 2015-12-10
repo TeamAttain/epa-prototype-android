@@ -11,7 +11,7 @@ public enum RequestKeys {
      */
     CLIENT_ID("client_id"), RESPONSE_TYPE("response_type"), SCOPE("scope"),
     REDIRECT_URI("redirect_uri"), EXPIRES_IN("expires_in"), PROMPT("prompt"),
-    STATE("state");
+    STATE("state"), USER_ID("user_id"), TOKEN_TYPE("token_type"), ACCESS_TOKEN("access_token");
 
     private final String paramValue;
 
