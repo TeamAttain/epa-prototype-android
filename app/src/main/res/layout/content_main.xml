@@ -13,4 +13,9 @@
 	tools:context="com.smashingboxes.epa_prototype_android.MainActivity"
 	tools:showIn="@layout/activity_main">
 
+	<TextView
+		android:id="@+id/user_profile"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+
 </RelativeLayout>

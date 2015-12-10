@@ -4,13 +4,17 @@ import android.content.Context;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.smashingboxes.epa_prototype_android.fitbit.FitbitApi;
+import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
+import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrategy;
 
 /**
  * Created by Austin Lanier on 12/8/15.
  * Updated by
  */
-public class NetworkRequestManager {
+public class NetworkRequestManager implements RequestHandler {
 
     public static class NetworkExecutionException extends Exception {
         public NetworkExecutionException(String e) {
@@ -56,11 +60,16 @@ public class NetworkRequestManager {
         return requestQueue;
     }
 
+    public Context getContext(){
+        return mContext;
+    }
+
     /**
      * Cancels all requests for the given object tag
      *
      * @param tag
      */
+    @Override
     public void cancelAllForTag(Object tag) {
         getRequestQueue().cancelAll(tag);
     }
@@ -74,8 +83,10 @@ public class NetworkRequestManager {
      * @param request
      * @param tag
      */
-    public void addRequest(Request<?> request, Object tag) {
+    @Override
+    public void addRequest(BaseRequest<?> request, Object tag) {
         request.setTag(tag);
         getRequestQueue().add(request);
     }
+
 }

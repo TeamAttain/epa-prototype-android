@@ -5,7 +5,9 @@ import android.text.TextUtils;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitOAuth2;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Austin Lanier on 12/8/15.
@@ -18,6 +20,7 @@ public class FitbitAuthModel extends OAuth2Model {
     }
 
     private final List<FitbitOAuth2.Scope> availableScopes;
+    private Map<String, String> authHeaders;
     private final String user_id;
     private final String token_type;
 
@@ -44,6 +47,12 @@ public class FitbitAuthModel extends OAuth2Model {
 
     public String getTokenType(){
         return token_type;
+    }
+
+    public Map<String, String> getAuthHeaders(){
+        Map<String, String> authHeaders = new HashMap<>();
+        authHeaders.put("Authorization", getTokenType() + " " + getAccessToken());
+        return authHeaders;
     }
 
     public FlowType getFlowType(){
