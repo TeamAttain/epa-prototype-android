@@ -5,7 +5,7 @@ package com.smashingboxes.epa_prototype_android.models;
  * Updated by
  */
 public class FitbitActivity {
-    
+
     private final long activityId;
     private final long activityParentId;
     private final int calories;

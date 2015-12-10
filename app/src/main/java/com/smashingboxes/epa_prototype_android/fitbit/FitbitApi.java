@@ -10,6 +10,8 @@ import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
  */
 public interface FitbitApi {
 
+    String CURRENT_USER_ID = "-";
+
     /**
      * GET https://api.fitbit.com/1/user/[user-id]/profile.json]
      *
@@ -28,7 +30,7 @@ public interface FitbitApi {
      *
      * GET https://api.fitbit.com/1/user/[user-id]/profile.json
      *
-     * Retrieves the current logged in user's profile
+     * Retrieves the current logged in user's data by CURRENT_USER_ID
      *
      * @param cancelTag
      * @param fitbitProfileListener
@@ -53,4 +55,16 @@ public interface FitbitApi {
     void getUserActivityData(Object cancelTag, String userId, String date, Response.Listener<ActivityData> fitbitActivityListener, Response.ErrorListener errorListener);
 
 
+    /**
+     *
+     * GET https://api.fitbitcom/1/user/[user-id]/activities/date/[date].json
+     *
+     * Retrieves the user's activity data by CURRENT_USER_ID
+     *
+     * @param cancelTag
+     * @param date
+     * @param fitbitActivityListener
+     * @param errorListener
+     */
+    void getCurrentUserActivityData(Object cancelTag, String date, Response.Listener<ActivityData> fitbitActivityListener, Response.ErrorListener errorListener);
 }

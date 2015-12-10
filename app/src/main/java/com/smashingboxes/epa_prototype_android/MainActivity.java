@@ -15,6 +15,8 @@ import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
+import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
+import com.smashingboxes.epa_prototype_android.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,12 +24,21 @@ public class MainActivity extends AppCompatActivity {
     private FitbitLoginCache loginCache;
     private FitbitRequestManager requestManager;
     private FitbitProfile userProfile;
+    private ActivityData activityData;
 
     private Response.Listener<FitbitProfile> profileListener = new Response.Listener<FitbitProfile>(){
         @Override
         public void onResponse(FitbitProfile response) {
             userProfile = response;
-            ((TextView) findViewById(R.id.user_profile)).setText(new Gson().toJson(response));
+            ((TextView) findViewById(R.id.user_profile)).append(new Gson().toJson(response));
+        }
+    };
+
+    private Response.Listener<ActivityData> activityListener = new Response.Listener<ActivityData>(){
+        @Override
+        public void onResponse(ActivityData response) {
+            activityData = response;
+            ((TextView) findViewById(R.id.user_profile)).append(new Gson().toJson(response));
         }
     };
 
@@ -35,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            ((TextView) findViewById(R.id.user_profile)).setText(new Gson().toJson(error));
+            ((TextView) findViewById(R.id.user_profile)).append(new Gson().toJson(error));
         }
     };
 
@@ -59,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         requestManager = new FitbitRequestManager(loginCache.getLoginModel());
         requestManager.getCurrentUserProfile(this, profileListener, errorListener);
+        requestManager.getCurrentUserActivityData(this, DateHelper.generateCurrentDateTime(), activityListener, errorListener);
     }
 
 
