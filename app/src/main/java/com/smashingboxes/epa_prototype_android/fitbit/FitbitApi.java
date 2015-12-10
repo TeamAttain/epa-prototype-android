@@ -6,5 +6,5 @@ package com.smashingboxes.epa_prototype_android.fitbit;
  */
 public interface FitbitApi {
 
-    
+
 }

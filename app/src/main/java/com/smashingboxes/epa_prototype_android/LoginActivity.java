@@ -87,10 +87,11 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
         startActivity(toLoggedInActivity);
     }
 
+    //UNUSED FOR NOW UNTIL WE HAVE A WAY TO USE OUR CLIENT SECRET, FOR NOW
+    //WE USE THE IMPLICIT FITBIT FLOW RATHER THAN THE AUTHORIZATION FLOW
     @Override
     public void sendFitbitRefreshRequest() {
-        //UNUSED FOR NOW UNTIL WE HAVE A WAY TO USE OUR CLIENT SECRET, FOR NOW
-        //WE USE THE IMPLICIT FITBIT FLOW RATHER THAN THE AUTHORIZATION FLOW
+        startAuthenticationFlow(); //delegate to auth flow for now
     }
 }
 
