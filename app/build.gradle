@@ -1,5 +1,7 @@
 buildscript {
     repositories {
+        mavenCentral()
+        mavenLocal()  // For google-play-services is not on Maven Central
         maven { url 'https://maven.fabric.io/public' }
     }
 
