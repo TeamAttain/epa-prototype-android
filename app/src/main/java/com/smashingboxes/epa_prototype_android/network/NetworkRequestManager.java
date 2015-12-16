@@ -16,12 +16,6 @@ import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrateg
  */
 public class NetworkRequestManager implements RequestHandler {
 
-    public static class NetworkExecutionException extends Exception {
-        public NetworkExecutionException(String e) {
-            super(e);
-        }
-    }
-
     private static final NetworkRequestManager mManager = new NetworkRequestManager();
 
     private static final String TAG = NetworkRequestManager.class.getName();
@@ -36,8 +30,9 @@ public class NetworkRequestManager implements RequestHandler {
      * Returns the NetworkRequestManager singleton
      */
     public static NetworkRequestManager getInstance(Context context) {
-        if(NetworkRequestManager.requestQueue == null){
-            NetworkRequestManager.initQueue(context);
+        if(requestQueue == null){
+            initQueue(context);
+            mContext = context.getApplicationContext();
         }
         return mManager;
     }
@@ -50,7 +45,6 @@ public class NetworkRequestManager implements RequestHandler {
     public static void initQueue(Context context) {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-            mContext = context.getApplicationContext();
         }
     }
 
