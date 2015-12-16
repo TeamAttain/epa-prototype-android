@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.smashingboxes.epa_prototype_android"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+	package="com.smashingboxes.epa_prototype_android"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<!-- To auto-complete the email text field in the login form with the user's emails -->
 	<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 	<uses-permission android:name="android.permission.READ_PROFILE"/>
 	<uses-permission android:name="android.permission.READ_CONTACTS"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
 	<application
 		android:name=".MainApplication"
@@ -35,11 +37,6 @@
 					android:scheme="@string/fitbit_scheme"/>
 			</intent-filter>
 		</activity>
-
-		<meta-data
-			android:name="io.fabric.ApiKey"
-			android:value="065e226ac40e5a3f81b8d11e5eeed8ea2d3770f4"/>
-
 		<activity
 			android:name=".MainActivity"
 			android:label="@string/title_activity_main"
@@ -49,6 +46,14 @@
 			android:name=".fitbit.settings.SettingsActivity"
 			android:label="@string/title_activity_settings">
 		</activity>
+
+		<meta-data
+			android:name="io.fabric.ApiKey"
+			android:value="065e226ac40e5a3f81b8d11e5eeed8ea2d3770f4"/>
+		<meta-data
+			android:name="com.google.android.geo.API_KEY"
+			android:value="@string/epa_api_key"/>
+
 	</application>
 
 </manifest>

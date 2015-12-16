@@ -2,18 +2,22 @@ package com.smashingboxes.epa_prototype_android;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.TimeSeriesResourcePath;
@@ -22,9 +26,13 @@ import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
 import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
 import com.smashingboxes.epa_prototype_android.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
+import com.smashingboxes.epa_prototype_android.models.SimplePlace;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int PICK_PLACE_REQUEST = 123;
+    private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
 
     private FitbitLoginCache loginCache;
     private FitbitRequestManager requestManager;
@@ -84,38 +92,84 @@ public class MainActivity extends AppCompatActivity {
         detailsAdapter = new JsonDetailsAdapter(this);
         recyclerView.setAdapter(detailsAdapter);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!startSelectUserLocationActivity()) {
+            fetchData();
+        }
+    }
+
+    private void fetchData() {
         getUserProfile();
         getUserActivity();
         getCurrentlySelectedTimeSeries();
     }
 
-    private void getUserProfile(){
+    private boolean startSelectUserLocationActivity() {
+        if (AppStateManager.getInstance(this).getPlace() == null) {
+            try {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                startActivityForResult(builder.build(this), PICK_PLACE_REQUEST);
+                return true;
+            } catch (GooglePlayServicesRepairableException e) {
+                Toast.makeText(getApplicationContext(), R.string.play_services_repairable, Toast.LENGTH_LONG).show();
+            } catch (GooglePlayServicesNotAvailableException ex) {
+                GooglePlayServicesUtil.showErrorDialogFragment(ex.errorCode, this, null, REQUEST_CODE_PLAY_SERVICES_ERROR, null);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_PLACE_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                SimplePlace placeToStore = new SimplePlace(place.getId(), place.getName().toString(), place.getAddress().toString(),
+                        place.getLatLng().latitude, place.getLatLng().longitude);
+                AppStateManager.getInstance(this).savePlace(placeToStore);
+                Toast.makeText(this, place.getName(), Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void getUserProfile() {
         requestManager.getCurrentUserProfile(profileListener, errorListener);
     }
 
-    private void onUserProfileReceived(FitbitProfile profile){
+    private void onUserProfileReceived(FitbitProfile profile) {
         this.userProfile = profile;
         detailsAdapter.addObject(profile);
     }
 
-    private void getUserActivity(){
+    private void getUserActivity() {
         requestManager.getCurrentUserDailySummaryActivityData(DateHelper.generateCurrentDateTime(), activityListener, errorListener);
     }
 
-    private void onActivityDataReceievd(ActivityData activityData){
+    private void onActivityDataReceievd(ActivityData activityData) {
         this.activityData = activityData;
         detailsAdapter.addObject(activityData);
     }
 
 
-    private void getCurrentlySelectedTimeSeries(){
-        requestManager.getCurrentUserTimeSeriesData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
+    private void getCurrentlySelectedTimeSeries() {
+        requestManager.getCurrentUserTimeSeriesTrackerData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
                 Period._3M, timeSeriesListener, errorListener);
     }
 
-    private void onTimeSeriesReceived(String timeSeries){
+    private void onTimeSeriesReceived(String timeSeries) {
         this.timeSeries = timeSeries;
         detailsAdapter.addObject(timeSeries);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

@@ -95,7 +95,7 @@ public class FitbitOAuth2 {
                             Scope.SETTINGS, Scope.SLEEP, Scope.SOCIAL, Scope.WEIGHT))
                     .setRedirectUri(FitbitOAuth2.this.getRedirectUriScheme(activity.getString(R.string.fitbit_scheme),
                             activity.getString(R.string.fitbit_host)))
-                    .setExpiresIn(ExpiresIn._604800);
+                    .setExpiresIn(ExpiresIn._86400);
             return builder.buildRequestUri();
         }
 
