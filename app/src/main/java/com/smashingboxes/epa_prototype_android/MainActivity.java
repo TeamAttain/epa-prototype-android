@@ -15,9 +15,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.TimeSeriesResourcePath;
@@ -31,7 +31,8 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PICK_PLACE_REQEST = 123;
+    private static final int PICK_PLACE_REQUEST = 123;
+    private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
 
     private FitbitLoginCache loginCache;
     private FitbitRequestManager requestManager;
@@ -91,18 +92,17 @@ public class MainActivity extends AppCompatActivity {
         detailsAdapter = new JsonDetailsAdapter(this);
         recyclerView.setAdapter(detailsAdapter);
 
-        if(!startSelectUserLocationActivity()) {
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!startSelectUserLocationActivity()) {
             fetchData();
         }
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        fetchData();
-    }
-
-    private void fetchData(){
+    private void fetchData() {
         getUserProfile();
         getUserActivity();
         getCurrentlySelectedTimeSeries();
@@ -112,10 +112,12 @@ public class MainActivity extends AppCompatActivity {
         if (AppStateManager.getInstance(this).getPlace() == null) {
             try {
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                startActivityForResult(builder.build(this), PICK_PLACE_REQEST);
+                startActivityForResult(builder.build(this), PICK_PLACE_REQUEST);
                 return true;
-            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
+            } catch (GooglePlayServicesRepairableException e) {
+                Toast.makeText(getApplicationContext(), R.string.play_services_repairable, Toast.LENGTH_LONG).show();
+            } catch (GooglePlayServicesNotAvailableException ex) {
+                GooglePlayServicesUtil.showErrorDialogFragment(ex.errorCode, this, null, REQUEST_CODE_PLAY_SERVICES_ERROR, null);
             }
         }
         return false;
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_PLACE_REQEST) {
+        if (requestCode == PICK_PLACE_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 SimplePlace placeToStore = new SimplePlace(place.getId(), place.getName().toString(), place.getAddress().toString(),
