@@ -51,13 +51,21 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
         if (redirect_uri != null) {
             handleRedirectUri(redirect_uri);
         }
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        FitbitAuthModel authModel = mFitbitLoginCache.getLoginModel();
+        if(authModel != null){
+            if(authModel.isExpired()){
+                sendFitbitRefreshRequest();
+            } else {
+                onFitbitUserAuthenticated();
+            }
+        } else {
+            startAuthenticationFlow();
+        }
     }
 
     @Override
