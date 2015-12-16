@@ -42,10 +42,16 @@ public class PreferenceHelper {
      * @param key    - the key to associate with this object
      * @param object - the object to persist
      */
-    public void persistObject(String key, Object object) {
+    public void persistObjectAsync(String key, Object object) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, gson.toJson(object));
         editor.apply();
+    }
+
+    public void persistObjectSync(String key, Object object){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, gson.toJson(object));
+        editor.commit();
     }
 
     /**

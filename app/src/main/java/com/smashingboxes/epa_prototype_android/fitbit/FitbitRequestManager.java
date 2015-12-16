@@ -86,15 +86,15 @@ public class FitbitRequestManager implements FitbitApi, RequestHandler {
     }
 
     @Override
-    public void getUserTimeSeriesData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
-        String url = UrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getFullPath(), date, period.durationKey);
+    public void getUserTimeSeriesTrackerData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
+        String url = UrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getTrackerPath(), date, period.durationKey);
         BaseRequest<String> getTimeSeriesData = new BaseRequest<>(Request.Method.GET, url, responseListener,
                 errorListener, BaseRequest.NO_PARSE_STRAT);
         addRequest(getTimeSeriesData, cancelTag);
     }
 
     @Override
-    public void getCurrentUserTimeSeriesData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
-        getUserTimeSeriesData(CURRENT_USER_ID, resourcePath, date, period, responseListener, errorListener);
+    public void getCurrentUserTimeSeriesTrackerData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
+        getUserTimeSeriesTrackerData(CURRENT_USER_ID, resourcePath, date, period, responseListener, errorListener);
     }
 }

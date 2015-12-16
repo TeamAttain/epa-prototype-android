@@ -50,7 +50,7 @@ public interface FitbitActivityApi {
      * @param responseListener
      * @param errorListener
      */
-    void getUserTimeSeriesData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
+    void getUserTimeSeriesTrackerData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
 
     /**
      * GET /1/user/-/[resource-path]/date/[base-date]/[end-date].json
@@ -64,6 +64,6 @@ public interface FitbitActivityApi {
      * @param responseListener
      * @param errorListener
      */
-    void getCurrentUserTimeSeriesData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
+    void getCurrentUserTimeSeriesTrackerData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
 
 }

@@ -33,12 +33,12 @@ public class FitbitLoginCache {
     }
 
     /**
-     * Stores the last login model
+     * Asynchronously stores the last login model
      *
      * @param loginModel - the login model to persist
      */
     public void saveLoginModel(FitbitAuthModel loginModel) {
-        mCacheHelper.persistObject(KEY_LOGGED_IN_MODEL, loginModel);
+        mCacheHelper.persistObjectAsync(KEY_LOGGED_IN_MODEL, loginModel);
         this.loginModel = loginModel;
     }
 

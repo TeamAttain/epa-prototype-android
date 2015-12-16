@@ -37,7 +37,7 @@ public class AppStateManager {
 
     public void savePlace(SimplePlace place) {
         this.place = place;
-        mPreferenceHelper.persistObject(PLACE_KEY, place);
+        mPreferenceHelper.persistObjectSync(PLACE_KEY, place);
     }
 
     public void clearPlace() {

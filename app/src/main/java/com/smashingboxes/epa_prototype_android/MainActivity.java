@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -90,21 +91,34 @@ public class MainActivity extends AppCompatActivity {
         detailsAdapter = new JsonDetailsAdapter(this);
         recyclerView.setAdapter(detailsAdapter);
 
+        if(!startSelectUserLocationActivity()) {
+            fetchData();
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        fetchData();
+    }
+
+    private void fetchData(){
         getUserProfile();
         getUserActivity();
         getCurrentlySelectedTimeSeries();
-        startSelectUserLocationActivity();
     }
 
-    private void startSelectUserLocationActivity() {
+    private boolean startSelectUserLocationActivity() {
         if (AppStateManager.getInstance(this).getPlace() == null) {
             try {
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 startActivityForResult(builder.build(this), PICK_PLACE_REQEST);
+                return true;
             } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                 e.printStackTrace();
             }
         }
+        return false;
     }
 
     @Override
@@ -141,13 +155,19 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCurrentlySelectedTimeSeries() {
-        requestManager.getCurrentUserTimeSeriesData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
+        requestManager.getCurrentUserTimeSeriesTrackerData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
                 Period._3M, timeSeriesListener, errorListener);
     }
 
     private void onTimeSeriesReceived(String timeSeries) {
         this.timeSeries = timeSeries;
         detailsAdapter.addObject(timeSeries);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

@@ -47,21 +47,17 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
         Intent intent = getIntent();
         mFitbitLoginCache = FitbitLoginCache.getInstance(this);
 
-        FitbitAuthModel authModel = mFitbitLoginCache.getLoginModel();
-        if (authModel != null) {
-            if (!authModel.isExpired()) {
-                onFitbitUserAuthenticated();
-            } else {
-                sendFitbitRefreshRequest();
-            }
-        } else {
-            Uri redirect_uri = intent.getData();
-            if (redirect_uri != null) {
-                handleRedirectUri(redirect_uri);
-            } else {
-                startAuthenticationFlow();
-            }
+        Uri redirect_uri = intent.getData();
+        if (redirect_uri != null) {
+            handleRedirectUri(redirect_uri);
         }
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -94,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
     //WE USE THE IMPLICIT FITBIT FLOW RATHER THAN THE AUTHORIZATION FLOW
     @Override
     public void sendFitbitRefreshRequest() {
+        mFitbitLoginCache.clearLogin();
         startAuthenticationFlow(); //delegate to auth flow for now
     }
 }
