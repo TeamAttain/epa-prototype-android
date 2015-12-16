@@ -8,24 +8,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.TimeSeriesResourcePath;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
-import com.smashingboxes.epa_prototype_android.fitbit.location.LocationSelectionFragment;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
 import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
 import com.smashingboxes.epa_prototype_android.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
+import com.smashingboxes.epa_prototype_android.models.SimplePlace;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG_LOCATION_SELECTION = "com.smashingboxes.epa_prototype_android.TAG_LOCATION_SELECTION";
+    private static final int PICK_PLACE_REQEST = 123;
 
     private FitbitLoginCache loginCache;
     private FitbitRequestManager requestManager;
@@ -88,15 +93,32 @@ public class MainActivity extends AppCompatActivity {
         getUserProfile();
         getUserActivity();
         getCurrentlySelectedTimeSeries();
-        showSelectLocationDialog();
+        startSelectUserLocationActivity();
     }
 
-    private void showSelectLocationDialog(){
-        if(getSupportFragmentManager().findFragmentByTag(TAG_LOCATION_SELECTION) == null) {
-            LocationSelectionFragment fragment = new LocationSelectionFragment();
-            fragment.show(getSupportFragmentManager(), TAG_LOCATION_SELECTION);
+    private void startSelectUserLocationActivity() {
+        if (AppStateManager.getInstance(this).getPlace() == null) {
+            try {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                startActivityForResult(builder.build(this), PICK_PLACE_REQEST);
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
         }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_PLACE_REQEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                SimplePlace placeToStore = new SimplePlace(place.getId(), place.getName().toString(), place.getAddress().toString(),
+                        place.getLatLng().latitude, place.getLatLng().longitude);
+                AppStateManager.getInstance(this).savePlace(placeToStore);
+                Toast.makeText(this, place.getName(), Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void getUserProfile() {

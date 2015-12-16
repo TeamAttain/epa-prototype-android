@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 /**
  * Created by Austin Lanier on 12/8/15.
  */
-public class PreferenceHelper<T> {
+public class PreferenceHelper {
 
     private SharedPreferences preferences;
 
@@ -42,11 +42,10 @@ public class PreferenceHelper<T> {
      * @param key    - the key to associate with this object
      * @param object - the object to persist
      */
-    public T persistObject(String key, T object) {
+    public void persistObject(String key, Object object) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, gson.toJson(object));
         editor.apply();
-        return object;
     }
 
     /**
@@ -63,7 +62,7 @@ public class PreferenceHelper<T> {
      * @param clazz - the class of the returned object type
      * @return the object associated with the key, or null if an error occurred
      */
-    public T getObject(String key, Class<T> clazz) {
+    public <T> T getObject(String key, Class<T> clazz) {
         T t = null;
         try {
             String objectAsJson = preferences.getString(key, null);

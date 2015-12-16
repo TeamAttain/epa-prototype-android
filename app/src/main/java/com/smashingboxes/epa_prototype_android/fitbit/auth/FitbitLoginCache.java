@@ -19,7 +19,7 @@ public class FitbitLoginCache {
     private static FitbitLoginCache sMFitbitLoginCache;
 
     private FitbitAuthModel loginModel;
-    private PreferenceHelper<FitbitAuthModel> mCacheHelper;
+    private PreferenceHelper mCacheHelper;
 
     public static synchronized FitbitLoginCache getInstance(Context context) {
         if (sMFitbitLoginCache == null) {
@@ -29,7 +29,7 @@ public class FitbitLoginCache {
     }
 
     private FitbitLoginCache(Context context) {
-        mCacheHelper = new PreferenceHelper<>(context);
+        mCacheHelper = new PreferenceHelper(context);
     }
 
     /**
@@ -54,12 +54,12 @@ public class FitbitLoginCache {
         return loginModel;
     }
 
-    public void clearLogin(){
+    public void clearLogin() {
         mCacheHelper.removeObjectForKey(KEY_LOGGED_IN_MODEL);
         loginModel = null;
     }
 
-    public static void logout(Context context){
+    public static void logout(Context context) {
         FitbitLoginCache.getInstance(context).clearLogin();
 
         Intent intent = new Intent(context, LoginActivity.class);
