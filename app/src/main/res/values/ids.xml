@@ -4,5 +4,8 @@
 	<item name="recycler_view" type="id"/>
 	<item name="web_view" type="id"/>
 	<item name="menu_logout" type="id"/>
+	<item name="menu_settings" type="id"/>
+	<item name="user_image" type="id"/>
+	<item name="user_details_container" type="id"/>
 
 </resources>

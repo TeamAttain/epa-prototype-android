@@ -35,7 +35,10 @@ public class NetworkRequestManager implements RequestHandler {
     /**
      * Returns the NetworkRequestManager singleton
      */
-    public static NetworkRequestManager getInstance() {
+    public static NetworkRequestManager getInstance(Context context) {
+        if(NetworkRequestManager.requestQueue == null){
+            NetworkRequestManager.initQueue(context);
+        }
         return mManager;
     }
 

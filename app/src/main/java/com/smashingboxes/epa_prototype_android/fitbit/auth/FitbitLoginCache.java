@@ -1,6 +1,5 @@
-package com.smashingboxes.epa_prototype_android.fitbit;
+package com.smashingboxes.epa_prototype_android.fitbit.auth;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 

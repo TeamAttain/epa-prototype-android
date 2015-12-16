@@ -16,7 +16,6 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
-        NetworkRequestManager.initQueue(this);
     }
 
 }

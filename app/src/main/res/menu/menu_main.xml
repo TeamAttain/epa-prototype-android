@@ -3,6 +3,10 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".welcome.MainActivity">
 	<item
+		android:id="@id/menu_settings"
+		android:title="@string/title_activity_main"
+		app:showAsAction="never"/>
+	<item
 		android:id="@id/menu_logout"
 		android:title="@string/logout"
 		app:showAsAction="never"/>

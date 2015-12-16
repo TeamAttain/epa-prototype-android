@@ -1,8 +1,6 @@
 package com.smashingboxes.epa_prototype_android.models;
 
-import android.text.TextUtils;
-
-import com.smashingboxes.epa_prototype_android.fitbit.FitbitOAuth2;
+import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitOAuth2;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,10 +12,6 @@ import java.util.Map;
  * Updated by
  */
 public class FitbitAuthModel extends OAuth2Model {
-
-    public enum FlowType {
-        IMPLICIT, AUTHENICATION
-    }
 
     private final List<FitbitOAuth2.Scope> availableScopes;
     private Map<String, String> authHeaders;
@@ -32,7 +26,6 @@ public class FitbitAuthModel extends OAuth2Model {
     }
 
     /**
-     *
      * A List of allowed FitBit api scopes
      *
      * @return an unmodifiable list of available scopes
@@ -41,22 +34,18 @@ public class FitbitAuthModel extends OAuth2Model {
         return Collections.unmodifiableList(availableScopes);
     }
 
-    public String getUserId(){
+    public String getUserId() {
         return user_id;
     }
 
-    public String getTokenType(){
+    public String getTokenType() {
         return token_type;
     }
 
-    public Map<String, String> getAuthHeaders(){
+    public Map<String, String> getAuthHeaders() {
         Map<String, String> authHeaders = new HashMap<>();
         authHeaders.put("Authorization", getTokenType() + " " + getAccessToken());
         return authHeaders;
-    }
-
-    public FlowType getFlowType(){
-        return TextUtils.isEmpty(getRefreshToken()) ? FlowType.IMPLICIT : FlowType.AUTHENICATION;
     }
 
     @Override
