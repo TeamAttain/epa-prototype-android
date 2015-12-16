@@ -1,14 +1,15 @@
-package com.smashingboxes.epa_prototype_android.fitbit;
+package com.smashingboxes.epa_prototype_android.fitbit.auth;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.RawRes;
 import android.text.TextUtils;
 
 import com.smashingboxes.epa_prototype_android.R;
+import com.smashingboxes.epa_prototype_android.fitbit.UriBuilder;
+import com.smashingboxes.epa_prototype_android.fitbit.UriParser;
 import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
 import com.smashingboxes.epa_prototype_android.network.ParamBuilder;
 import com.smashingboxes.epa_prototype_android.network.RequestKeys;
@@ -32,6 +33,19 @@ public class FitbitOAuth2 {
 
     private static final String CLIENT_ID = "229XJ8";
 
+    /**
+     * @see https://dev.fitbit.com/docs/oauth2/
+     */
+    public enum AuthFlowType {
+        IMPLICIT, AUTHENICATION
+    }
+
+    private AuthFlowType mAuthFlowType;
+
+    public FitbitOAuth2(AuthFlowType flowType){
+        this.mAuthFlowType = flowType;
+    }
+
     public enum ResponseType {
         CODE, TOKEN
     }
@@ -42,6 +56,16 @@ public class FitbitOAuth2 {
 
     public enum Prompt {
         NONE, LOGIN, CONSENT
+    }
+
+    public enum ExpiresIn {
+        _86400("86400"), _604800("604800"), _2592000("2592000");
+
+        final String keyValue;
+
+        ExpiresIn(String keyValue){
+            this.keyValue = keyValue;
+        }
     }
 
     public class FitbitAuthUriBuilder implements UriBuilder {
@@ -71,7 +95,7 @@ public class FitbitOAuth2 {
                             Scope.SETTINGS, Scope.SLEEP, Scope.SOCIAL, Scope.WEIGHT))
                     .setRedirectUri(FitbitOAuth2.this.getRedirectUriScheme(activity.getString(R.string.fitbit_scheme),
                             activity.getString(R.string.fitbit_host)))
-                    .setExpiresIn();
+                    .setExpiresIn(ExpiresIn._604800);
             return builder.buildRequestUri();
         }
 
@@ -105,8 +129,8 @@ public class FitbitOAuth2 {
             return this;
         }
 
-        public FitbitAuthUriBuilder setExpiresIn() {
-            mParamBuilder.put(RequestKeys.EXPIRES_IN.getParamValue(), "86400");
+        public FitbitAuthUriBuilder setExpiresIn(ExpiresIn expiresIn) {
+            mParamBuilder.put(RequestKeys.EXPIRES_IN.getParamValue(), expiresIn.keyValue);
             return this;
         }
 
