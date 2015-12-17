@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void getCurrentlySelectedTimeSeries() {
         fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
-                Period._3M, timeSeriesListener, errorListener);
+                Period._1W, timeSeriesListener, errorListener);
     }
 
     private void onTimeSeriesReceived(String timeSeries) {
