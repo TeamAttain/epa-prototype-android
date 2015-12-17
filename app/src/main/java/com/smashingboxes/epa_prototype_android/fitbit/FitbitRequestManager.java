@@ -14,7 +14,6 @@ import com.smashingboxes.epa_prototype_android.network.BaseRequest;
 import com.smashingboxes.epa_prototype_android.network.ForceCacheRequest;
 import com.smashingboxes.epa_prototype_android.network.NetworkRequestManager;
 import com.smashingboxes.epa_prototype_android.network.RequestHandler;
-import com.smashingboxes.epa_prototype_android.network.UrlGenerator;
 import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrategy;
 
 /**
@@ -61,7 +60,7 @@ public class FitbitRequestManager implements FitbitApi, RequestHandler {
 
     @Override
     public void getUserProfile(String userId, Response.Listener<FitbitProfile> fitbitProfileListener, Response.ErrorListener errorListener) {
-        String url = UrlGenerator.getFitbitUserProfileUrl(userId);
+        String url = FitbitUrlGenerator.getFitbitUserProfileUrl(userId);
         BaseRequest<FitbitProfile> getProfile = new ForceCacheRequest<>(Request.Method.GET, url,
                 fitbitProfileListener, errorListener, new ClassParseStrategy<>(FitbitProfile.class));
         addRequest(getProfile, cancelTag);
@@ -74,7 +73,7 @@ public class FitbitRequestManager implements FitbitApi, RequestHandler {
 
     @Override
     public void getUserDailySummaryActivityData(String userId, String date, Response.Listener<ActivityData> fitbitActivityListener, Response.ErrorListener errorListener) {
-        String url = UrlGenerator.getFitbitUserActivitiesUrl(userId, date);
+        String url = FitbitUrlGenerator.getFitbitUserActivitiesUrl(userId, date);
         BaseRequest<ActivityData> getProfile = new ForceCacheRequest<>(Request.Method.GET, url,
                 fitbitActivityListener, errorListener, new ClassParseStrategy<>(ActivityData.class));
         addRequest(getProfile, cancelTag);
@@ -87,7 +86,7 @@ public class FitbitRequestManager implements FitbitApi, RequestHandler {
 
     @Override
     public void getUserTimeSeriesTrackerData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
-        String url = UrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getTrackerPath(), date, period.durationKey);
+        String url = FitbitUrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getTrackerPath(), date, period.durationKey);
         BaseRequest<String> getTimeSeriesData = new ForceCacheRequest<>(Request.Method.GET, url, responseListener,
                 errorListener, BaseRequest.NO_PARSE_STRAT);
         addRequest(getTimeSeriesData, cancelTag);

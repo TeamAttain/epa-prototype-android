@@ -17,8 +17,6 @@ import com.android.volley.Response;
  */
 public class ForceCacheRequest<T> extends BaseRequest<T> {
 
-    private static final String TAG = ForceCacheRequest.class.getName();
-
     private static final int DEFAULT_MAX_AGE = 5 * 60; //5 minutes
 
     private int max_age_seconds;
@@ -40,9 +38,4 @@ public class ForceCacheRequest<T> extends BaseRequest<T> {
         return super.parseCacheEntry(response);
     }
 
-    @Override
-    public void addMarker(String tag) {
-        super.addMarker(tag);
-        Log.i(TAG, tag);
-    }
 }

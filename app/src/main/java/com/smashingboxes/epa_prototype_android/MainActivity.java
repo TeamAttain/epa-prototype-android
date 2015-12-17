@@ -25,9 +25,14 @@ import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
 import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
 import com.smashingboxes.epa_prototype_android.models.ActivityData;
+import com.smashingboxes.epa_prototype_android.models.AirQuality;
 import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
 import com.smashingboxes.epa_prototype_android.models.SimplePlace;
+import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,43 +40,51 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
 
     private FitbitLoginCache loginCache;
-    private FitbitRequestManager requestManager;
+    private FitbitRequestManager fitbitRequestManager;
+    private EpaRequestManager epaRequestManager;
 
     private Picasso picasso;
     private FitbitProfile userProfile;
     private ActivityData activityData;
     private String timeSeries;
+    private ArrayList<AirQuality> airQualityTimeSeries;
 
-    private Response.Listener<FitbitProfile> profileListener = new Response.Listener<FitbitProfile>() {
+    private final Response.Listener<FitbitProfile> profileListener = new Response.Listener<FitbitProfile>() {
         @Override
         public void onResponse(FitbitProfile response) {
             onUserProfileReceived(response);
         }
     };
 
-    private Response.Listener<ActivityData> activityListener = new Response.Listener<ActivityData>() {
+    private final Response.Listener<ActivityData> activityListener = new Response.Listener<ActivityData>() {
         @Override
         public void onResponse(ActivityData response) {
             onActivityDataReceievd(response);
         }
     };
 
-    private Response.Listener<String> timeSeriesListener = new Response.Listener<String>() {
+    private final Response.Listener<String> timeSeriesListener = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
             onTimeSeriesReceived(response);
         }
     };
 
+    private final Response.Listener<ArrayList<AirQuality>> airQualityListener = new Response.Listener<ArrayList<AirQuality>>(){
+        @Override
+        public void onResponse(ArrayList<AirQuality> response) {
+            onAirQualityReceived(response);
+        }
+    };
+
     //TODO SUBCLASS
-    private Response.ErrorListener errorListener = new Response.ErrorListener() {
+    private final Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
 
         }
     };
 
-    private RecyclerView recyclerView;
     private JsonDetailsAdapter detailsAdapter;
     private TimeSeriesResourcePath selectedTimeSeries = TimeSeriesResourcePath.STEPS;
 
@@ -83,15 +96,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         loginCache = FitbitLoginCache.getInstance(this);
-        requestManager = new FitbitRequestManager(this, loginCache.getLoginModel(), this);
+        fitbitRequestManager = new FitbitRequestManager(this, loginCache.getLoginModel(), this);
+        epaRequestManager = new EpaRequestManager(this, this);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         detailsAdapter = new JsonDetailsAdapter(this);
         recyclerView.setAdapter(detailsAdapter);
-
     }
 
     @Override
@@ -106,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         getUserProfile();
         getUserActivity();
         getCurrentlySelectedTimeSeries();
+        getAirQualityData();
     }
 
     private boolean startSelectUserLocationActivity() {
@@ -138,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUserProfile() {
-        requestManager.getCurrentUserProfile(profileListener, errorListener);
+        fitbitRequestManager.getCurrentUserProfile(profileListener, errorListener);
     }
 
     private void onUserProfileReceived(FitbitProfile profile) {
@@ -147,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUserActivity() {
-        requestManager.getCurrentUserDailySummaryActivityData(DateHelper.generateCurrentDateTime(), activityListener, errorListener);
+        fitbitRequestManager.getCurrentUserDailySummaryActivityData(DateHelper.generateCurrentDateTime(), activityListener, errorListener);
     }
 
     private void onActivityDataReceievd(ActivityData activityData) {
@@ -157,13 +171,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void getCurrentlySelectedTimeSeries() {
-        requestManager.getCurrentUserTimeSeriesTrackerData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
+        fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedTimeSeries, DateHelper.generateCurrentDateTime(),
                 Period._3M, timeSeriesListener, errorListener);
     }
 
     private void onTimeSeriesReceived(String timeSeries) {
         this.timeSeries = timeSeries;
         detailsAdapter.addObject(timeSeries);
+    }
+
+    private void getAirQualityData(){
+        SimplePlace currentPlace = AppStateManager.getInstance(this).getPlace();
+        if(currentPlace != null){
+            epaRequestManager.getAirQualityData(currentPlace, airQualityListener, errorListener);
+        }
+    }
+
+    private void onAirQualityReceived(ArrayList<AirQuality> airQuality){
+        airQualityTimeSeries = airQuality;
+        detailsAdapter.addObject(airQuality);
     }
 
     @Override
@@ -185,7 +211,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        requestManager.cancelAllForTag(this);
+        fitbitRequestManager.cancelAllForTag(this);
+        epaRequestManager.cancelAllForTag(this);
         super.onStop();
     }
 }
