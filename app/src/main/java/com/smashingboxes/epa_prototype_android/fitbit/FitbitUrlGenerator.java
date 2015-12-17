@@ -1,7 +1,7 @@
-package com.smashingboxes.epa_prototype_android.network;
+package com.smashingboxes.epa_prototype_android.fitbit;
 
 
-public class UrlGenerator {
+public class FitbitUrlGenerator {
 
     public static String getUserPath(String userId){
         return String.format("https://api.fitbit.com/1/user/%s", userId);
