@@ -13,7 +13,7 @@ public class EpaUrlGenerator {
     }
 
     public static final String getActivtiesUrl(){
-        return BASE_URL + "/api/activities";
+        return BASE_URL + "/activities";
     }
 
     public static final String getActivityDetailsUrl(String date){

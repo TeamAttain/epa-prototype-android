@@ -160,7 +160,8 @@ public class MainActivity extends AppCompatActivity {
         detailsAdapter = new JsonDetailsAdapter(this);
         recyclerView.setAdapter(detailsAdapter);
 
-        fetchData();
+        //fetchData();
+        showSelectActivityLocationDialog();
     }
 
     private void fetchData() {

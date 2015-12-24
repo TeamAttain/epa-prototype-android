@@ -1,6 +1,5 @@
 package com.smashingboxes.epa_prototype_android.network.epa;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -28,7 +27,7 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
 
     private static NetworkRequestManager delegate;
     private static Gson gson = new Gson();
-    private static DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 5,
+    private static DefaultRetryPolicy retryPolicy = new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2,
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     private Object cancelTag;
@@ -43,6 +42,7 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
 
     @Override
     public void addRequest(BaseRequest<?> request, Object tag) {
+        request.setRetryPolicy(retryPolicy);
         delegate.addRequest(request, tag);
     }
 
