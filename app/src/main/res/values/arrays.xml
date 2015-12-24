@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string-array name="air_quality_titles">
+		<item>GOOD</item>
+		<item>MODERATE</item>
+		<item>UNHEALTHY FOR SENSITIVE_GROUPS</item>
+		<item>UNHEALTHY</item>
+		<item>VERY UNHEALTHY</item>
+	</string-array>
+
+	<integer-array name="air_quality_colors">
+		<item>@color/air_good</item>
+		<item>@color/air_moderate</item>
+		<item>@color/air_unhealthy_for_sensitive</item>
+		<item>@color/air_unhealthy</item>
+		<item>@color/air_very_unhealthy</item>
+	</integer-array>
+
+
+</resources>

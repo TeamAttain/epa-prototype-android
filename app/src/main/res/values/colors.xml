@@ -3,4 +3,15 @@
 	<color name="colorPrimary">#3F51B5</color>
 	<color name="colorPrimaryDark">#303F9F</color>
 	<color name="colorAccent">#FF4081</color>
+	<color name="colorLightPrimary">#FDE4D4</color>
+
+	<color name="splash_blue">#2895fe</color>
+	<color name="splash_green">#00ce23</color>
+	<color name="air_good">#a5d027</color>
+	<color name="air_moderate">#fff300</color>
+	<color name="air_unhealthy_for_sensitive">#f88f00</color>
+	<color name="air_unhealthy">#f12314</color>
+	<color name="air_very_unhealthy">#a41849</color>
+
+
 </resources>

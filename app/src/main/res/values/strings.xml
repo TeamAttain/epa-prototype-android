@@ -1,7 +1,5 @@
 <resources>
-	<string name="app_name">epa-prototype-android</string>
-	<string name="title_activity_main">MainActivity</string>
-
+	<string name="app_name">AirFit</string>
 
 	<string name="epa_api_key">AIzaSyCqpkfBvxW4-xn_2bbjFhHEAe4PvOEO1kE</string>
 	<string name="cancel">Cancel</string>
