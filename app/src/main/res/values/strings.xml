@@ -1,5 +1,6 @@
 <resources>
 	<string name="app_name">AirFit</string>
+	<string name="epa">EPA</string>
 
 	<string name="epa_api_key">AIzaSyCqpkfBvxW4-xn_2bbjFhHEAe4PvOEO1kE</string>
 	<string name="cancel">Cancel</string>
@@ -29,6 +30,9 @@
 
 	<!-- MainActivity -->
 	<string name="play_services_repairable">Google Play Services currently unavailable.  Please check your connection.</string>
+
+	<!-- Splash Login -->
+	<string name="signin_with_fitbit">Sign in with Fitbit</string>
 
 	<!-- Strings related to Settings -->
 	<!-- Example General settings -->

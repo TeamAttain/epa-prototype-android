@@ -83,7 +83,7 @@ public class LocationSelectionFragment extends AppCompatDialogFragment {
         recyclerView.setBackgroundColor(Color.WHITE);
         recyclerView.setAdapter(mAdapter);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dialog_Alert_V7);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.select_location);
         builder.setNegativeButton(R.string.cancel, null);
         builder.setView(view);

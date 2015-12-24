@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showSelectActivityLocationDialog(){
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppTheme_Dialog_Alert_V7);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         final ListView optionsListView = (ListView) getLayoutInflater().inflate(R.layout.listview, null, false);
         final List<EpaActivity.Location> items = new ArrayList<>(Arrays.asList(EpaActivity.Location.values()));
         optionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

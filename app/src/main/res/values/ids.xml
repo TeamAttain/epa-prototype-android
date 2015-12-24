@@ -9,5 +9,6 @@
 	<item name="menu_settings" type="id"/>
 	<item name="user_image" type="id"/>
 	<item name="user_details_container" type="id"/>
+	<item name="sign_in_button" type="id"/>
 
 </resources>
