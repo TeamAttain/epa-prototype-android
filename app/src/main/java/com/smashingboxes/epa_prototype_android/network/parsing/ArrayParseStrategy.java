@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.smashingboxes.epa_prototype_android.network.BaseRequest;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class ArrayParseStrategy<T> implements BaseRequest.ResponseParseStrategy<
 
     @Override
     public ArrayList<T> parseResponse(String rawResponse) throws VolleyError {
-        ArrayList<T> mItems = null;
+        ArrayList<T> mItems;
         try {
             JsonParser jsonParser = new JsonParser();
             JsonElement element = jsonParser.parse(rawResponse);

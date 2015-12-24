@@ -1,4 +1,4 @@
-package com.smashingboxes.epa_prototype_android.models;
+package com.smashingboxes.epa_prototype_android.fitbit.models;
 
 /**
  * Created by Austin Lanier on 12/10/15.
@@ -6,7 +6,6 @@ package com.smashingboxes.epa_prototype_android.models;
  * <p/>
  */
 public class FitbitProfile {
-
 
     private final UserModel user;
 

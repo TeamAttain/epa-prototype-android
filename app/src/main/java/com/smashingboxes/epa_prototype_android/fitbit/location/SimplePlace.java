@@ -1,6 +1,4 @@
-package com.smashingboxes.epa_prototype_android.models;
-
-import com.google.android.gms.location.places.Place;
+package com.smashingboxes.epa_prototype_android.fitbit.location;
 
 /**
  * Created by Austin Lanier on 12/16/15.

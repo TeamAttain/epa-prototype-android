@@ -1,4 +1,4 @@
-package com.smashingboxes.epa_prototype_android.network;
+package com.smashingboxes.epa_prototype_android.network.requests;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
@@ -29,6 +29,7 @@ public class BaseRequest<T> extends Request<T> {
     private Listener<T> listener;
     private Map<String, String> params;
     private Map<String, String> headers;
+    private byte[] requestBody;
 
     public BaseRequest(int method, String url, Listener<T> mListener, ErrorListener errorListener,
                        ResponseParseStrategy<T> mParseStrategy) {
@@ -76,6 +77,15 @@ public class BaseRequest<T> extends Request<T> {
     @Override
     protected Map<String, String> getPostParams() throws AuthFailureError {
         return params;
+    }
+
+    public void setRequestBody(byte[] requestBody){
+        this.requestBody = requestBody;
+    }
+
+    @Override
+    public byte[] getBody() throws AuthFailureError {
+        return requestBody == null ? super.getBody() : requestBody;
     }
 
     @Override

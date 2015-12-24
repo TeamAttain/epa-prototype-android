@@ -1,4 +1,4 @@
-package com.smashingboxes.epa_prototype_android.models;
+package com.smashingboxes.epa_prototype_android.network.epa.models;
 
 /**
  * Created by Austin Lanier on 12/17/15.

@@ -1,7 +1,7 @@
 package com.smashingboxes.epa_prototype_android.fitbit.user;
 
 import com.android.volley.Response;
-import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
 
 /**
  * Created by Austin Lanier on 12/10/15.

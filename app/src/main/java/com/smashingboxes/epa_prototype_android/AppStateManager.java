@@ -3,7 +3,7 @@ package com.smashingboxes.epa_prototype_android;
 import android.content.Context;
 
 import com.smashingboxes.epa_prototype_android.helpers.PreferenceHelper;
-import com.smashingboxes.epa_prototype_android.models.SimplePlace;
+import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 
 /**
  * Created by Austin Lanier on 12/16/15.

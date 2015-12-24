@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.smashingboxes.epa_prototype_android.LoginActivity;
 import com.smashingboxes.epa_prototype_android.helpers.PreferenceHelper;
-import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
 
 /**
  * Created by Austin Lanier on 12/8/15.

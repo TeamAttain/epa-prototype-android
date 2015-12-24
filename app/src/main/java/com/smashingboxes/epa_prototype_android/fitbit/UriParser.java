@@ -1,6 +1,6 @@
 package com.smashingboxes.epa_prototype_android.fitbit;
 
-import com.smashingboxes.epa_prototype_android.models.OAuth2Model;
+import com.smashingboxes.epa_prototype_android.fitbit.models.OAuth2Model;
 
 /**
  * Created by Austin Lanier on 12/10/15.

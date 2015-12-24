@@ -10,7 +10,7 @@ import com.smashingboxes.epa_prototype_android.fitbit.UriParser;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitAuthController;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitOAuth2;
-import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
 
 /**
  * Created by Austin Lanier on 12/8/15.
