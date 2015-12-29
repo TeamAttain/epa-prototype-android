@@ -17,7 +17,6 @@ import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAct
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.h6ah4i.android.widget.advrecyclerview.utils.RecyclerViewAdapterUtils;
 import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
-import com.smashingboxes.epa_prototype_android.helpers.LocationHelper;
 import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
 import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivity;
@@ -66,12 +65,12 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
     private MainActivity mainActivity;
     private List<AirQuality> airQualities = new ArrayList<>();
     private Map<String, TimeSeries> dateToActivityMap = new HashMap<>();
-    private LocationHelper locationHelper;
+    private AppStateManager appStateManager;
     private Handler handler = new Handler();
 
     public MainActivityAdapter(@NonNull MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        this.locationHelper = new LocationHelper(mainActivity);
+        this.appStateManager = AppStateManager.getInstance(mainActivity);
         setHasStableIds(true);
     }
 
@@ -173,7 +172,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         boolean isLocationPinned = isLocationPinned(position);
         holder.setSwipeItemHorizontalSlideAmount(
                 isLocationPinned ? SwipeableItemConstants.OUTSIDE_OF_THE_WINDOW_LEFT : 0);
-        if(isLocationPinned){
+        if (isLocationPinned) {
             holder.setSwipeItemHorizontalSlideAmount(SwipeableItemConstants.OUTSIDE_OF_THE_WINDOW_LEFT);
             holder.activityInside.setOnClickListener(mItemViewOnClickListener);
             holder.activityOutside.setOnClickListener(mItemViewOnClickListener);
@@ -198,7 +197,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
             holder.activityDistanceText.setText("0");
         }
 
-        EpaActivity.Location location = locationHelper.getLocation(getAirQualityDateKey(airQuality));
+        EpaActivity.Location location = appStateManager.getLocation(getAirQualityDateKey(airQuality));
         holder.activityLocation.setText(location.titleRes);
         holder.activityLocation.setTextAppearance(location.style);
 
@@ -247,7 +246,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
                 //Handle location addition update, this should usually be done after the network call has finished
                 //but we're doing it here for the sake of time
                 AirQuality airQuality = getItem(viewHolder.getAdapterPosition());
-                locationHelper.addLocation(getAirQualityDateKey(airQuality),
+                appStateManager.addLocation(getAirQualityDateKey(airQuality),
                         EpaActivity.Location.valueOf(((TextView) v).getText().toString()));
 
                 //Unpin

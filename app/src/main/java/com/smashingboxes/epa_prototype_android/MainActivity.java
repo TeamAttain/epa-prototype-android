@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
@@ -19,12 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,9 +35,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.ActivityResourcePath;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
@@ -51,7 +45,6 @@ import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
 import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
-import com.smashingboxes.epa_prototype_android.helpers.LocationHelper;
 import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
@@ -61,15 +54,12 @@ import com.smashingboxes.epa_prototype_android.views.DividerItemDecoration;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 public class MainActivity extends AppCompatActivity implements MainActivityAdapter.SwipeEventListener {
 
@@ -186,11 +176,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         loginCache = FitbitLoginCache.getInstance(this);
         fitbitRequestManager = new FitbitRequestManager(this, loginCache.getLoginModel(), this);
         epaRequestManager = new EpaRequestManager(this, this);
-
-        initializeSwipeHandling();
     }
 
-    private void initializeSwipeHandling(){
+    private void initializeSwipeHandling() {
         RecyclerViewTouchActionGuardManager mRecyclerViewTouchActionGuardManager = new RecyclerViewTouchActionGuardManager();
         mRecyclerViewTouchActionGuardManager.setInterceptVerticalScrollingWhileAnimationRunning(true);
         mRecyclerViewTouchActionGuardManager.setEnabled(true);
@@ -222,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     @Override
     protected void onStart() {
         super.onStart();
+        initializeSwipeHandling();
         fetchData();
     }
 
@@ -268,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 SimplePlace placeToStore = new SimplePlace(place.getId(), place.getName().toString(), place.getAddress().toString(),
                         place.getLatLng().latitude, place.getLatLng().longitude);
                 AppStateManager.getInstance(this).savePlace(placeToStore);
-                fetchData();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -382,6 +370,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             FitbitLoginCache.logout(this);
         } else if (id == R.id.menu_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.menu_select_location) {
+            startSelectUserLocationActivity();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -423,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 EpaActivity.Location mLocation = EpaActivity.Location.valueOf(locationButton.getText().toString());
                 postActivityForCurrentPlace(mLocation);
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

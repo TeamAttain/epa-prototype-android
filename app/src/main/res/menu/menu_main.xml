@@ -7,6 +7,9 @@
 		android:title="@string/title_activity_settings"
 		app:showAsAction="never"/>
 	<item
+		android:id="@id/menu_select_location"
+		android:title="@string/select_location"/>
+	<item
 		android:id="@id/menu_logout"
 		android:title="@string/logout"
 		app:showAsAction="never"/>

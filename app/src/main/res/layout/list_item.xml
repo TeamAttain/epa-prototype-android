@@ -15,7 +15,8 @@
 		android:gravity="center"
 		android:padding="@dimen/content_item_padding_medium"
 		android:text="@string/outside"
-		android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"/>
+		android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+		android:textColor="@color/colorLightPrimary"/>
 
 	<TextView
 		android:id="@id/activity_inside"
@@ -27,7 +28,8 @@
 		android:gravity="center"
 		android:padding="@dimen/content_item_padding_medium"
 		android:text="@string/inside"
-		android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"/>
+		android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
+		android:textColor="@color/colorLightPrimary"/>
 
 	<LinearLayout
 		android:id="@id/swipe_container"
