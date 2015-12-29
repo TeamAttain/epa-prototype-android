@@ -37,14 +37,12 @@
 				android:id="@id/activity_date"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Today"
 				android:textAppearance="@style/AppTheme.TextAppearance.GreyText"/>
 
 			<TextView
 				android:id="@id/activity_name"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Running"
 				android:textAppearance="@style/AppTheme.TextAppearance.BlackText"/>
 
 		</LinearLayout>
@@ -61,7 +59,6 @@
 				android:id="@id/activity_distance"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="2.73"
 				android:textAppearance="@style/AppTheme.TextAppearance.BlackText"/>
 
 			<TextView
@@ -78,7 +75,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignParentEnd="true"
-			android:text="@string/swipe_to_add_location"
+			android:text="@string/swipe_to_add_activity"
 			android:gravity="center"
 			android:layout_centerVertical="true"
 			android:textAppearance="@style/AppTheme.TextAppearance.GreyText"

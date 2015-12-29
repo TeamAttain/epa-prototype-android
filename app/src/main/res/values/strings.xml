@@ -7,6 +7,7 @@
 	<string name="cancel">Cancel</string>
 	<string name="ok">Ok</string>
 	<string name="allow">Allow</string>
+	<string name="none">None</string>
 
 	<!-- Fitbit -->
 	<string name="fitbit_scheme">fitbitepaauth</string>
@@ -20,7 +21,8 @@
 	<string name="permission_location_denied">Location permission denied</string>
 	<string name="select_location">Select Location</string>
 	<string name="activity_location_selection">Select Activity Location</string>
-	<string name="swipe_to_add_location">Swipe to\nadd location</string>
+	<string name="swipe_to_add_activity">Swipe to\nadd Activity</string>
+	<string name="swipe_to_edit_activity">Swipe to\nedit Activity</string>
 
 	<!-- General -->
 	<string name="logout">Logout</string>

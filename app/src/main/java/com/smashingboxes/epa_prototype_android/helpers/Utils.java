@@ -1,7 +1,10 @@
 package com.smashingboxes.epa_prototype_android.helpers;
 
 import java.io.Closeable;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -16,6 +19,11 @@ public class Utils {
     public static final SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ",
             Locale.getDefault());
 
+    private static final DecimalFormat df = new DecimalFormat("###.##");
+    static {
+        df.setRoundingMode(RoundingMode.CEILING);
+    }
+
     public static String formatDate(String date){
         try {
             return displayFormatter.format(parser.parse(date));
@@ -23,6 +31,14 @@ public class Utils {
             e.printStackTrace();
             return date;
         }
+    }
+
+    public static String formatLong(long time){
+        return parser.format(new Date(time));
+    }
+
+    public static String formatDistance(float distance){
+        return df.format(distance);
     }
 
     public static void closeQuietly(Closeable closeable) {

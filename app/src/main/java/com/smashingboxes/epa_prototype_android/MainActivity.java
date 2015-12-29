@@ -39,12 +39,15 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.ActivityRecognitionApi;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitActivity;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
 import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
 import com.smashingboxes.epa_prototype_android.helpers.Utils;
@@ -56,11 +59,15 @@ import com.smashingboxes.epa_prototype_android.views.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class MainActivity extends AppCompatActivity {
@@ -94,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
      * Response Objects
      */
     private ActivityData activityData;
+    private FitbitProfile userProfile;
 
     /*
      * A List of AirQualities ordered from most recent to oldest
@@ -119,10 +127,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final Response.Listener<String> postActivitiesListener = new Response.Listener<String>() {
+    private final Response.Listener<String> postActivitiesListener  = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
-            Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+
         }
     };
 
@@ -172,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new SlideInLeftAnimator());
+        recyclerView.setItemAnimator(new LandingAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         activitiesAdapter = new MainActivityAdapter(this);
         recyclerView.setAdapter(activitiesAdapter);
@@ -235,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onActivityDataRecieved(ActivityData activityData) {
         this.activityData = activityData;
+
     }
 
     private void getAirQualityData() {
@@ -246,20 +255,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void onAirQualityReceived(ArrayList<AirQuality> airQuality) {
-        if(airQuality.size() > 0) {
-            airQualityList = airQuality;
-            setUpHeader(airQuality.get(0));
-            activitiesAdapter.queuedRemoveAll();
-            activitiesAdapter.queuedAddAll(airQuality, getResources().getInteger(android.R.integer.config_shortAnimTime));
+    private void onAirQualityReceived(ArrayList<AirQuality> airQualities) {
+        addFakeDataIfEmpty(airQualities);
+        if(airQualities.size() > 0) {
+            airQualityList = airQualities;
+            setUpHeader(airQualities.get(0));
+            activitiesAdapter.queuedRemoveAll(getResources().getInteger(android.R.integer.config_shortAnimTime));
+            activitiesAdapter.queuedAddAll(airQualities, getResources().getInteger(android.R.integer.config_shortAnimTime));
         } else {
-            Snackbar snackbar = makeSnackbar(getString(R.string.error_no_air_quality_data), getString(R.string.try_again), new View.OnClickListener() {
+            makeSnackbar(getString(R.string.error_no_air_quality_data), getString(R.string.try_again), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     fetchData();
                 }
-            });
-            snackbar.show();
+            }).show();
+        }
+    }
+
+    private void addFakeDataIfEmpty(ArrayList<AirQuality> airQualities){
+        if(airQualities.size() == 0){
+            Random random = new Random(System.currentTimeMillis());
+            for(int i = 1; i < 8; i++) {
+                int aqi = random.nextInt(500);
+                AirQuality.IndexType indexType = AirQuality.IndexType.forIndexRange(aqi);
+                String now = Utils.formatLong(System.currentTimeMillis());
+                airQualities.add(new AirQuality(i, random.nextInt(500) / i, indexType.getTitle(), now, i,
+                        0, "EST", 0, "", "", "NC", "", now, now));
+            }
         }
     }
 
@@ -380,17 +402,22 @@ public class MainActivity extends AppCompatActivity {
 
         private MainActivity mainActivity;
         private List<AirQuality> airQualities = new ArrayList<>();
+        private Map<AirQuality, FitbitActivity> activityDataMap = new HashMap<>();
         private Handler handler = new Handler();
 
         public MainActivityAdapter(@NonNull MainActivity mainActivity) {
             this.mainActivity = mainActivity;
         }
 
-        public void queuedRemoveAll() {
-            Iterator<AirQuality> iterator = airQualities.iterator();
-            while (iterator.hasNext()) {
-                iterator.remove();
-                notifyItemChanged(0);
+        public void queuedRemoveAll(long delay) {
+            int count = 0;
+            for(final AirQuality airQuality : airQualities){
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        removeItem(airQuality);
+                    }
+                }, count++ * delay);
             }
         }
 
@@ -412,6 +439,14 @@ public class MainActivity extends AppCompatActivity {
             notifyItemInserted(index);
         }
 
+        public FitbitActivity addActivityData(AirQuality key, FitbitActivity activityData){
+            return activityDataMap.put(key, activityData);
+        }
+
+        public FitbitActivity removedActivityData(AirQuality key){
+            return activityDataMap.remove(key);
+        }
+
         public void setItem(int position, AirQuality airQuality) {
             airQualities.set(position, airQuality);
             notifyItemInserted(position);
@@ -419,6 +454,13 @@ public class MainActivity extends AppCompatActivity {
 
         public AirQuality getItem(int position){
             return airQualities.get(position);
+        }
+
+        public boolean removeItem(AirQuality airQuality){
+            int index = airQualities.indexOf(airQuality);
+            boolean result = airQualities.remove(airQuality);
+            notifyItemRemoved(index);
+            return result;
         }
 
         @Override
@@ -433,6 +475,16 @@ public class MainActivity extends AppCompatActivity {
             holder.airQualityBorder.setBackground(new ColorDrawable(holder.itemView.getContext()
                     .getResources().getColor(indexType.getColor())));
             holder.activityDateText.setText(Utils.formatDate(airQuality.getDate_observed()));
+
+            FitbitActivity activityData = activityDataMap.get(airQuality);
+            if(activityData != null){
+                holder.activityTypeText.setText(activityData.getName());
+                holder.activityDistanceText.setText(Utils.formatDistance(activityData.getDistance()));
+            } else {
+                holder.activityTypeText.setText(mainActivity.getString(R.string.none));
+                holder.activityDistanceText.setText("0");
+            }
+
         }
 
         @Override
