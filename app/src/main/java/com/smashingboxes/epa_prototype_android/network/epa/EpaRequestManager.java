@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.network.NetworkRequestManager;
 import com.smashingboxes.epa_prototype_android.network.RequestHandler;
+import com.smashingboxes.epa_prototype_android.network.RequestKeys;
 import com.smashingboxes.epa_prototype_android.network.epa.models.ActivityPostRequest;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
 import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivity;
@@ -59,7 +60,7 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
     public void getAirQualityData(SimplePlace simplePlace, Response.Listener<ArrayList<AirQuality>> airQualityListener, Response.ErrorListener errorListener) {
         String url = EpaUrlGenerator.getAirQualityUrl(simplePlace.getLat(), simplePlace.getLng());
         BaseRequest<ArrayList<AirQuality>> getAirQuality = new BaseRequest<>(Request.Method.GET, url, airQualityListener,
-                errorListener, new ArrayParseStrategy<>(AirQuality.class));
+                errorListener, new ArrayParseStrategy<>(AirQuality.class, RequestKeys.AIR_QUALITY_OBSERVATIONS.getParamValue()));
         addRequest(getAirQuality, cancelTag);
     }
 
@@ -68,7 +69,7 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
     public void getActivityDetails(String date, Response.Listener<ArrayList<EpaActivityDetails>> activitiesListener, Response.ErrorListener errorListener) {
         String url = EpaUrlGenerator.getActivityDetailsUrl(date);
         BaseRequest<ArrayList<EpaActivityDetails>> getActivityDetails = new BaseRequest<>(Request.Method.GET, url,
-                activitiesListener, errorListener, new ArrayParseStrategy<>(EpaActivityDetails.class));
+                activitiesListener, errorListener, new ArrayParseStrategy<>(EpaActivityDetails.class, ""));
         addRequest(getActivityDetails, cancelTag);
     }
 
