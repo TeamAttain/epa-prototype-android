@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId "com.smashingboxes.epa_prototype_android"
-        minSdkVersion 17
+        minSdkVersion 18
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"

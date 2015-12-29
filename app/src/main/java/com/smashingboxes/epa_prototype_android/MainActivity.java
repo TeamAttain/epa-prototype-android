@@ -1,7 +1,12 @@
 package com.smashingboxes.epa_prototype_android;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -90,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
      * A List of AirQualities ordered from most recent to oldest
      */
     private List<AirQuality> airQualityList;
+    private AirQuality.IndexType todaysIndexType = AirQuality.IndexType.NONE;
 
     /*
      * Network Request Listeners
@@ -251,9 +257,21 @@ public class MainActivity extends AppCompatActivity {
     private void setUpHeader(AirQuality airQuality) {
         AirQuality.IndexType indexType = airQuality.getIndexType();
         headerTitle.setText(indexType.getTitle());
+        LayerDrawable background = (LayerDrawable) headerBackgroundColor.getBackground();
+        animateBackgroundDrawable((GradientDrawable) background.getDrawable(0), getResources().getColor(indexType.getColor()));
         mCollapsingToolbarLayout.setContentScrim(new ColorDrawable(getResources().getColor(indexType.getColor())));
-        //headerBackgroundColor.setBackground(new ColorDrawable(
-               // getResources().getColor(indexType.getColor())));
+    }
+
+    private void animateBackgroundDrawable(final GradientDrawable gradientDrawable, int toColor) {
+        ValueAnimator animator = ObjectAnimator.ofObject(new ArgbEvaluator() {
+            @Override
+            public Object evaluate(float fraction, Object startValue, Object endValue) {
+                int eval = (Integer) super.evaluate(fraction, startValue, endValue);
+                gradientDrawable.setColor(eval);
+                return eval;
+            }
+        }, todaysIndexType.getColor(), toColor).setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+        animator.start();
     }
 
     private void showSelectActivityLocationDialog() {
