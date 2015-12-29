@@ -52,14 +52,11 @@
 		android:layout_height="0dp"
 		android:layout_weight="1">
 
-		<TextView
+		<ImageView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
-			android:text="@string/epa"
-			android:textSize="@dimen/login_title"
-			android:textStyle="bold"
-			android:textColor="#1a6bba"/>
+			android:src="@drawable/ic_epa_logo"/>
 
 	</FrameLayout>
 
