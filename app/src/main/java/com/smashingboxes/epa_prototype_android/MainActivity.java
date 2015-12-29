@@ -13,6 +13,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private static final int PICK_PLACE_REQUEST = 123;
     private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
+
+    private static final String INFO_LINK_HTML = "<a href=\"%s\">%s</a>";
 
     /*
      * Fragment Tags
@@ -132,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
      */
     @Bind(R.id.air_quality_title)
     TextView headerTitle;
+    @Bind(R.id.air_quality_info_link)
+    TextView headerInfo;
     @Bind(R.id.backdrop)
     ImageView headerBackgroundColor;
     @Bind(R.id.collapsing_toolbar)
@@ -148,6 +154,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
+
+        headerInfo.setText(Html.fromHtml(String.format(INFO_LINK_HTML, getString(R.string.air_quality_help),
+                getString(R.string.what_does_this_mean))));
+        headerInfo.setMovementMethod(LinkMovementMethod.getInstance());
 
         appStateManager = AppStateManager.getInstance(this);
         loginCache = FitbitLoginCache.getInstance(this);

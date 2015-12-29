@@ -17,5 +17,6 @@
 	<item name="activity_unit" type="id"/>
 	<item name="air_quality_status_border" type="id"/>
 	<item name="air_quality_title" type="id"/>
+	<item name="air_quality_info_link" type="id"/>
 
 </resources>

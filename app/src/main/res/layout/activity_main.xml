@@ -57,9 +57,10 @@
 					android:paddingBottom="@dimen/content_item_padding"/>
 
 				<TextView
+					android:id="@id/air_quality_info_link"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="@string/what_does_this_mean"/>
+					android:textColorLink="@color/colorPrimaryDark"/>
 			</LinearLayout>
 
 			<android.support.v7.widget.Toolbar
