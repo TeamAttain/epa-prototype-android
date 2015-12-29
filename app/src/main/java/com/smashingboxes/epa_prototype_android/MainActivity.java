@@ -176,6 +176,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         loginCache = FitbitLoginCache.getInstance(this);
         fitbitRequestManager = new FitbitRequestManager(this, loginCache.getLoginModel(), this);
         epaRequestManager = new EpaRequestManager(this, this);
+
+        initializeSwipeHandling();
+        fetchData();
     }
 
     private void initializeSwipeHandling() {
@@ -205,13 +208,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         mRecyclerViewTouchActionGuardManager.attachRecyclerView(recyclerView);
         swipeManager.attachRecyclerView(recyclerView);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        initializeSwipeHandling();
-        fetchData();
     }
 
     private void fetchData() {
@@ -256,7 +252,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 Place place = PlacePicker.getPlace(data, this);
                 SimplePlace placeToStore = new SimplePlace(place.getId(), place.getName().toString(), place.getAddress().toString(),
                         place.getLatLng().latitude, place.getLatLng().longitude);
-                AppStateManager.getInstance(this).savePlace(placeToStore);
+                appStateManager.savePlace(placeToStore);
+                fetchData();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

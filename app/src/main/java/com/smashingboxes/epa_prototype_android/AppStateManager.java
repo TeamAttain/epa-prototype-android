@@ -19,7 +19,7 @@ public class AppStateManager {
 
     private static AppStateManager ourInstance = new AppStateManager();
 
-    public static AppStateManager getInstance(Context context) {
+    public static synchronized AppStateManager getInstance(Context context) {
         if (ourInstance.mPreferenceHelper == null) {
             ourInstance.mPreferenceHelper = new PreferenceHelper(context.getApplicationContext());
         }
@@ -46,6 +46,7 @@ public class AppStateManager {
     }
 
     public void clearPlace() {
+        this.place = null;
         mPreferenceHelper.removeObjectForKey(PLACE_KEY);
     }
 
