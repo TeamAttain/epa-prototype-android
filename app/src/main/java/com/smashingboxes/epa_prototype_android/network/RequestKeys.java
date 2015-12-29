@@ -17,7 +17,7 @@ public enum RequestKeys {
     /**
      * EPA
      */
-    ACTIVITIES("activities"), AIR_QUALITY_OBSERVATIONS("air_quality_observations");
+    ACTIVITIES("activities"), AIR_QUALITY_OBSERVATIONS("air_quality_observations"), TODAY("today");
 
     private final String paramValue;
 

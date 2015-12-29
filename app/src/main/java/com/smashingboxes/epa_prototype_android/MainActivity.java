@@ -24,10 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,13 +36,15 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
+import com.smashingboxes.epa_prototype_android.fitbit.activity.ActivityResourcePath;
+import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitActivity;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
+import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
-import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
 import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
@@ -55,7 +54,6 @@ import com.smashingboxes.epa_prototype_android.views.DividerItemDecoration;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,12 +96,20 @@ public class MainActivity extends AppCompatActivity {
      * A List of AirQualities ordered from most recent to oldest
      */
     private List<AirQuality> airQualityList;
+
+    /*
+     * Today's last airquality index.  This is used to style the header
+     */
     private AirQuality.IndexType todaysIndexType = AirQuality.IndexType.NONE;
+
+    /*
+     * Our Fitbit resource path time series selection, default to distance
+     */
+    private ActivityResourcePath selectedResourcePath = ActivityResourcePath.DISTANCE;
 
     /*
      * Network Request Listeners
      */
-
     private final Response.Listener<ActivityData> activityListener = new Response.Listener<ActivityData>() {
         @Override
         public void onResponse(ActivityData response) {
@@ -122,6 +128,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResponse(JSONObject response) {
             Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+        }
+    };
+
+    private final Response.Listener<ArrayList<TimeSeries>> activityTimeSeriesListener = new Response.Listener<ArrayList<TimeSeries>>(){
+        @Override
+        public void onResponse(ArrayList<TimeSeries> response) {
+            activitiesAdapter.mapActivityDates(response);
         }
     };
 
@@ -174,14 +187,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         activitiesAdapter = new MainActivityAdapter(this);
         recyclerView.setAdapter(activitiesAdapter);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         fetchData();
-        showSelectActivityLocationDialog();
     }
 
     private void fetchData() {
-        getUserActivity();
         getAirQualityData();
+        getUserActivityTimeSeries();
     }
 
     private void startSelectUserLocationActivity() {
@@ -228,13 +244,17 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void getUserActivity() {
-        fitbitRequestManager.getCurrentUserDailySummaryActivityData(DateHelper.generateCurrentDateTime(), activityListener, errorListener);
+    private void getUserActivityTimeSeries(){
+        fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedResourcePath, Period._6M, activityTimeSeriesListener, errorListener);
+    }
+
+    private void getUserActivitySummary() {
+        fitbitRequestManager.getCurrentUserDailySummaryActivityData(Utils.generateFitbitCurrentDateTime(), activityListener, errorListener);
     }
 
     private void onActivityDataRecieved(ActivityData activityData) {
         this.activityData = activityData;
-
+        Toast.makeText(this, activityData.toString(), Toast.LENGTH_LONG).show();
     }
 
     private void getAirQualityData() {
@@ -252,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         if (airQualities.size() > 0) {
             airQualityList = airQualities;
             setUpHeader(airQualities.get(0));
-            activitiesAdapter.queuedRemoveAll(getResources().getInteger(android.R.integer.config_shortAnimTime));
+            activitiesAdapter.queuedRemoveAll();
             activitiesAdapter.queuedAddAll(airQualities, getResources().getInteger(android.R.integer.config_shortAnimTime));
         } else {
             makeSnackbar(getString(R.string.error_no_air_quality_data), getString(R.string.try_again), new View.OnClickListener() {
@@ -271,12 +291,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void addFakeDataIfEmpty(ArrayList<AirQuality> airQualities) {
         if (airQualities.size() == 0) {
+            final long DAY_MILLIS = 86400000;
             Random random = new Random(System.currentTimeMillis());
-            for (int i = 1; i < 8; i++) {
-                int aqi = random.nextInt(500);
+            for (int i = 0; i < 7; i++) {
+                int aqi = random.nextInt(350);
                 AirQuality.IndexType indexType = AirQuality.IndexType.forIndexRange(aqi);
-                String now = Utils.formatLong(System.currentTimeMillis());
-                airQualities.add(new AirQuality(i, random.nextInt(500) / i, indexType.getTitle(), now, i,
+                String now = Utils.formatTimeLong(System.currentTimeMillis() - (DAY_MILLIS * i));
+                airQualities.add(new AirQuality(i, aqi, indexType.getTitle(), now, i,
                         0, TimeZone.getDefault().getDisplayName(), 0, "", "", "NC", "", now, now));
             }
         }
@@ -350,6 +371,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public ActivityResourcePath getSelectedResourcePath(){
+        return selectedResourcePath;
+    }
 
     public static class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.ViewHolder> {
 
@@ -375,22 +399,21 @@ public class MainActivity extends AppCompatActivity {
 
         private MainActivity mainActivity;
         private List<AirQuality> airQualities = new ArrayList<>();
-        private Map<AirQuality, FitbitActivity> activityDataMap = new HashMap<>();
+        private Map<String, TimeSeries> dateToActivityMap = new HashMap<>();
         private Handler handler = new Handler();
 
         public MainActivityAdapter(@NonNull MainActivity mainActivity) {
             this.mainActivity = mainActivity;
         }
 
-        public void queuedRemoveAll(long delay) {
-            int count = 0;
+        public void queuedRemoveAll() {
             for (final AirQuality airQuality : airQualities) {
-                handler.postDelayed(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
                         removeItem(airQuality);
                     }
-                }, count++ * delay);
+                });
             }
         }
 
@@ -410,14 +433,6 @@ public class MainActivity extends AppCompatActivity {
             airQualities.add(airQuality);
             int index = airQualities.indexOf(airQuality);
             notifyItemInserted(index);
-        }
-
-        public FitbitActivity addActivityData(AirQuality key, FitbitActivity activityData) {
-            return activityDataMap.put(key, activityData);
-        }
-
-        public FitbitActivity removedActivityData(AirQuality key) {
-            return activityDataMap.remove(key);
         }
 
         public void setItem(int position, AirQuality airQuality) {
@@ -441,6 +456,39 @@ public class MainActivity extends AppCompatActivity {
             return airQualities.size();
         }
 
+        /**
+         * Maps a list of time series entiries to their activity dates
+         *
+         * @param activityTimeSeries
+         */
+        public void mapActivityDates(List<TimeSeries> activityTimeSeries){
+            dateToActivityMap.clear();
+            for(TimeSeries series : activityTimeSeries){
+                addActivityData(series);
+            }
+            notifyDataSetChanged();
+        }
+
+        /**
+         * Maps a time series entry to it's activity date
+         *
+         * @param activityData
+         * @return
+         */
+        public TimeSeries addActivityData(TimeSeries activityData) {
+            return dateToActivityMap.put(activityData.getDateTime(), activityData);
+        }
+
+        /**
+         * Retrieves a TimeSeries point for this AirQuality's date
+         *
+         * @param key
+         * @return
+         */
+        public TimeSeries forAirQuality(AirQuality key) {
+            return dateToActivityMap.get(Utils.generateFitbitDateTimeString(key.getCreated_at()));
+        }
+
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             AirQuality airQuality = getItem(position);
@@ -449,10 +497,10 @@ public class MainActivity extends AppCompatActivity {
                     .getResources().getColor(indexType.getColor())));
             holder.activityDateText.setText(Utils.formatDate(airQuality.getDate_observed()));
 
-            FitbitActivity activityData = activityDataMap.get(airQuality);
+            TimeSeries activityData = forAirQuality(airQuality);
             if (activityData != null) {
-                holder.activityTypeText.setText(activityData.getName());
-                holder.activityDistanceText.setText(Utils.formatDistance(activityData.getDistance()));
+                holder.activityTypeText.setText(mainActivity.getString(R.string.running));
+                holder.activityDistanceText.setText(Utils.formatDistance(activityData.getValue()));
             } else {
                 holder.activityTypeText.setText(mainActivity.getString(R.string.none));
                 holder.activityDistanceText.setText("0");
