@@ -2,13 +2,9 @@ package com.smashingboxes.epa_prototype_android.network;
 
 import android.content.Context;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
-import com.smashingboxes.epa_prototype_android.fitbit.FitbitApi;
-import com.smashingboxes.epa_prototype_android.models.FitbitProfile;
-import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrategy;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
 /**
  * Created by Austin Lanier on 12/8/15.

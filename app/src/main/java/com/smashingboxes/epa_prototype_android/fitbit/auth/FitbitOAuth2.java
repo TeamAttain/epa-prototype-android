@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import com.smashingboxes.epa_prototype_android.R;
 import com.smashingboxes.epa_prototype_android.fitbit.UriBuilder;
 import com.smashingboxes.epa_prototype_android.fitbit.UriParser;
-import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
 import com.smashingboxes.epa_prototype_android.network.ParamBuilder;
 import com.smashingboxes.epa_prototype_android.network.RequestKeys;
 

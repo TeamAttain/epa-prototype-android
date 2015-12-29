@@ -1,8 +1,9 @@
-package com.smashingboxes.epa_prototype_android.models;
+package com.smashingboxes.epa_prototype_android.fitbit.models;
 
 /**
  * Created by Austin Lanier on 12/10/15.
- * Updated by
+ *
+ * Represents a FitBit Activity Model
  */
 public class FitbitActivity {
 

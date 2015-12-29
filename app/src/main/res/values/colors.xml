@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="colorPrimary">#3F51B5</color>
-	<color name="colorPrimaryDark">#303F9F</color>
-	<color name="colorAccent">#FF4081</color>
+	<color name="colorPrimary">@color/splash_blue</color>
+	<color name="colorPrimaryDark">#000000</color>
+	<color name="colorAccent">#a9b6c2</color>
+	<color name="colorLightPrimary">@color/white</color>
+
+	<color name="white">#ffffff</color>
+	<color name="splash_blue">#2895fe</color>
+	<color name="splash_green">#00ce23</color>
+	<color name="air_good">#a5d027</color>
+	<color name="air_moderate">#fff300</color>
+	<color name="air_unhealthy_for_sensitive">#f88f00</color>
+	<color name="air_unhealthy">#f12314</color>
+	<color name="air_very_unhealthy">#a41849</color>
+	<color name="air_hazardous">#a41849</color>
+
+	<color name="trans_white_medium_dark">#60FFFFFF</color>
+	<color name="trans_white_dark">#90FFFFFF</color>
+
 </resources>

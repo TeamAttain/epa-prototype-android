@@ -3,7 +3,7 @@ package com.smashingboxes.epa_prototype_android.network.parsing;
 import com.android.volley.ParseError;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.smashingboxes.epa_prototype_android.network.BaseRequest;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
 public class ClassParseStrategy<T> implements BaseRequest.ResponseParseStrategy<T> {
 

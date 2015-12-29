@@ -1,7 +1,7 @@
 package com.smashingboxes.epa_prototype_android.fitbit.activity;
 
 import com.android.volley.Response;
-import com.smashingboxes.epa_prototype_android.models.ActivityData;
+import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
 
 /**
  * Created by Austin Lanier on 12/15/15.

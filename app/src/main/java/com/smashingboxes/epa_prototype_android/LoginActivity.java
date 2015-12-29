@@ -1,16 +1,19 @@
 package com.smashingboxes.epa_prototype_android;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.smashingboxes.epa_prototype_android.fitbit.UriParser;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitAuthController;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitOAuth2;
-import com.smashingboxes.epa_prototype_android.models.FitbitAuthModel;
+import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
 
 /**
  * Created by Austin Lanier on 12/8/15.
@@ -47,24 +50,23 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
         Intent intent = getIntent();
         mFitbitLoginCache = FitbitLoginCache.getInstance(this);
 
+        getSupportActionBar().hide();
+        tintLoginButton();
+
         Uri redirect_uri = intent.getData();
         if (redirect_uri != null) {
             handleRedirectUri(redirect_uri);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FitbitAuthModel authModel = mFitbitLoginCache.getLoginModel();
-        if(authModel != null){
-            if(authModel.isExpired()){
-                sendFitbitRefreshRequest();
-            } else {
-                onFitbitUserAuthenticated();
-            }
         } else {
-            startAuthenticationFlow();
+            FitbitAuthModel authModel = mFitbitLoginCache.getLoginModel();
+            if(authModel != null){
+                if(authModel.isExpired()){
+                    sendFitbitRefreshRequest();
+                } else {
+                    onFitbitUserAuthenticated();
+                }
+            } else {
+                enableloginButton();
+            }
         }
     }
 
@@ -84,6 +86,7 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
         } catch (UriParser.ParseException e) {
             e.printStackTrace();
             Toast.makeText(this, "Login Failure", Toast.LENGTH_LONG).show();
+            enableloginButton();
         }
     }
 
@@ -100,6 +103,20 @@ public class LoginActivity extends AppCompatActivity implements FitbitAuthContro
     public void sendFitbitRefreshRequest() {
         mFitbitLoginCache.clearLogin();
         startAuthenticationFlow(); //delegate to auth flow for now
+    }
+
+    private void enableloginButton(){
+        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAuthenticationFlow();
+            }
+        });
+    }
+
+    private void tintLoginButton(){
+        findViewById(R.id.sign_in_button).getBackground().setColorFilter(getResources().getColor(
+                R.color.splash_green), PorterDuff.Mode.MULTIPLY);
     }
 }
 

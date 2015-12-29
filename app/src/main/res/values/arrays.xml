@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<integer-array name="air_quality_colors">
+		<item>@color/air_good</item>
+		<item>@color/air_moderate</item>
+		<item>@color/air_unhealthy_for_sensitive</item>
+		<item>@color/air_unhealthy</item>
+		<item>@color/air_very_unhealthy</item>
+		<item>@color/air_hazardous</item>
+	</integer-array>
+
+
+</resources>

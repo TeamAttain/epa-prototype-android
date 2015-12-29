@@ -1,6 +1,6 @@
 package com.smashingboxes.epa_prototype_android.network.parsing;
 
-import com.smashingboxes.epa_prototype_android.network.BaseRequest;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
 /**
  * Returns the response sent from the server as a JSON string

@@ -1,10 +1,9 @@
-package com.smashingboxes.epa_prototype_android.network;
-
-import android.util.Log;
+package com.smashingboxes.epa_prototype_android.network.requests;
 
 import com.android.volley.Cache;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
 /**
  * Created by Austin Lanier on 12/16/15.
