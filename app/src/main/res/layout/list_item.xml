@@ -10,7 +10,7 @@
 		android:layout_width="@dimen/status_border"
 		android:layout_height="@dimen/list_item_min_height"
 		android:layout_marginRight="@dimen/content_item_padding"
-		android:background="@color/air_good"/>
+		android:background="@color/splash_blue"/>
 
 	<ImageView
 		android:layout_width="wrap_content"

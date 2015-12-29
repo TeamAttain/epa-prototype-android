@@ -3,6 +3,7 @@ package com.smashingboxes.epa_prototype_android;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -45,6 +46,7 @@ import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
 import com.smashingboxes.epa_prototype_android.helpers.DateHelper;
+import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
 import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivity;
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private final Response.Listener<ActivityData> activityListener = new Response.Listener<ActivityData>() {
         @Override
         public void onResponse(ActivityData response) {
-            onActivityDataReceievd(response);
+            onActivityDataRecieved(response);
         }
     };
 
@@ -119,13 +121,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResponse(String response) {
             Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
-        }
-    };
-
-    private final Response.Listener<ArrayList<EpaActivityDetails>> activityDetailsListener = new Response.Listener<ArrayList<EpaActivityDetails>>() {
-        @Override
-        public void onResponse(ArrayList<EpaActivityDetails> response) {
-            Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
         }
     };
 
@@ -234,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         fitbitRequestManager.getCurrentUserDailySummaryActivityData(DateHelper.generateCurrentDateTime(), activityListener, errorListener);
     }
 
-    private void onActivityDataReceievd(ActivityData activityData) {
+    private void onActivityDataRecieved(ActivityData activityData) {
         this.activityData = activityData;
     }
 
@@ -402,6 +397,10 @@ public class MainActivity extends AppCompatActivity {
             notifyItemInserted(position);
         }
 
+        public AirQuality getItem(int position){
+            return airQualities.get(position);
+        }
+
         @Override
         public int getItemCount() {
             return airQualities.size();
@@ -409,7 +408,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-
+            AirQuality airQuality = getItem(position);
+            AirQuality.IndexType indexType = airQuality.getIndexType();
+            holder.airQualityBorder.setBackground(new ColorDrawable(holder.itemView.getContext()
+                    .getResources().getColor(indexType.getColor())));
+            holder.activityDateText.setText(Utils.formatDate(airQuality.getDate_observed()));
         }
 
         @Override
