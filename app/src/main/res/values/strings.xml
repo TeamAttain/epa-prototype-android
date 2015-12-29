@@ -16,6 +16,11 @@
 	<string name="running">Running</string>
 
 	<!-- Location -->
+	<string name="inside">INSIDE</string>
+	<string name="inside_lower">Inside</string>
+	<string name="outside">OUTSIDE</string>
+	<string name="outside_lower">Outside</string>
+
 	<!-- Permissions -->
 	<string name="permission_location_title">Permission Request</string>
 	<string name="permission_location_msg">%s would like to access your location for accessing air quality data related to your area.</string>

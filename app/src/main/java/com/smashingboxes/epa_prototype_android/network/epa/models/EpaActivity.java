@@ -2,6 +2,8 @@ package com.smashingboxes.epa_prototype_android.network.epa.models;
 
 import android.support.annotation.NonNull;
 
+import com.smashingboxes.epa_prototype_android.R;
+
 import org.json.JSONObject;
 
 /**
@@ -11,12 +13,15 @@ import org.json.JSONObject;
 public class EpaActivity {
 
     public enum Location {
-        INSIDE("inside"), OUTSIDE("outside"), NONE("none");
+        INSIDE(R.string.inside_lower, R.style.AppTheme_TextAppearance_BlackText), OUTSIDE(R.string.outside_lower, R.style.AppTheme_TextAppearance_BlackText),
+        NONE(R.string.swipe_to_add_location, R.style.AppTheme_TextAppearance_GreyText);
 
-        public final String name;
+        public final int titleRes;
+        public final int style;
 
-        Location(String name) {
-            this.name = name;
+        Location(int titleRes, int style) {
+            this.titleRes = titleRes;
+            this.style = style;
         }
 
     }
@@ -28,7 +33,7 @@ public class EpaActivity {
     public EpaActivity(String lat, String lng, Location location) {
         this.lat = lat;
         this.lng = lng;
-        this.location = location.name;
+        this.location = location.name().toLowerCase();
     }
 
     public String getLat() {

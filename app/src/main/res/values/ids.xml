@@ -19,5 +19,8 @@
 	<item name="air_quality_title" type="id"/>
 	<item name="air_quality_info_link" type="id"/>
 	<item name="air_quality_today_info_container" type="id"/>
+	<item name="swipe_container" type="id"/>
+	<item name="activity_inside" type="id"/>
+	<item name="activity_outside" type="id"/>
 
 </resources>

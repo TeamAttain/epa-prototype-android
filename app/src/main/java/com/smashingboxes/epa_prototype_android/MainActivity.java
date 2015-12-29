@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,12 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
+import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
+import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchActionGuardManager;
+import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.ActivityResourcePath;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
@@ -64,7 +71,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityAdapter.SwipeEventListener {
 
     /*
      * Activity Result Request Codes
@@ -180,13 +187,36 @@ public class MainActivity extends AppCompatActivity {
         fitbitRequestManager = new FitbitRequestManager(this, loginCache.getLoginModel(), this);
         epaRequestManager = new EpaRequestManager(this, this);
 
+        initializeSwipeHandling();
+    }
+
+    private void initializeSwipeHandling(){
+        RecyclerViewTouchActionGuardManager mRecyclerViewTouchActionGuardManager = new RecyclerViewTouchActionGuardManager();
+        mRecyclerViewTouchActionGuardManager.setInterceptVerticalScrollingWhileAnimationRunning(true);
+        mRecyclerViewTouchActionGuardManager.setEnabled(true);
+
+        RecyclerViewSwipeManager swipeManager = new RecyclerViewSwipeManager();
+
+        activitiesAdapter = new MainActivityAdapter(this);
+        activitiesAdapter.setSwipeEventListener(this);
+
+        RecyclerView.Adapter<?> wrappedAdapter = swipeManager.createWrappedAdapter(activitiesAdapter);
+
+        final GeneralItemAnimator animator = new SwipeDismissItemAnimator();
+
+        // Change animations are enabled by default since support-v7-recyclerview v22.
+        // Disable the change animation in order to make turning back animation of swiped item works properly.
+        animator.setSupportsChangeAnimations(false);
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new LandingAnimator());
+        recyclerView.setItemAnimator(animator);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-        activitiesAdapter = new MainActivityAdapter(this);
-        recyclerView.setAdapter(activitiesAdapter);
+        recyclerView.setAdapter(wrappedAdapter);
+
+        mRecyclerViewTouchActionGuardManager.attachRecyclerView(recyclerView);
+        swipeManager.attachRecyclerView(recyclerView);
     }
 
     @Override
@@ -245,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUserActivityTimeSeries() {
-        fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedResourcePath, Period._6M, activityTimeSeriesListener, errorListener);
+        fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedResourcePath, Period._1W, activityTimeSeriesListener, errorListener);
     }
 
     private void getUserActivitySummary() {
@@ -375,151 +405,26 @@ public class MainActivity extends AppCompatActivity {
         return selectedResourcePath;
     }
 
-    public static class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.ViewHolder> {
+    @Override
+    public void onItemRemoved(int position) {
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-
-            View airQualityBorder;
-            TextView activityDateText;
-            TextView activityTypeText;
-            TextView activityDistanceText;
-            TextView activityDistanceUnit;
-            TextView activityLocation;
-
-            public ViewHolder(View view) {
-                super(view);
-                airQualityBorder = view.findViewById(R.id.air_quality_status_border);
-                activityDateText = (TextView) view.findViewById(R.id.activity_date);
-                activityTypeText = (TextView) view.findViewById(R.id.activity_name);
-                activityDistanceText = (TextView) view.findViewById(R.id.activity_distance);
-                activityDistanceUnit = (TextView) view.findViewById(R.id.activity_unit);
-                activityLocation = (TextView) view.findViewById(R.id.activity_location);
-            }
-        }
-
-        private MainActivity mainActivity;
-        private List<AirQuality> airQualities = new ArrayList<>();
-        private Map<String, TimeSeries> dateToActivityMap = new HashMap<>();
-        private LocationHelper locationHelper;
-        private Handler handler = new Handler();
-
-        public MainActivityAdapter(@NonNull MainActivity mainActivity) {
-            this.mainActivity = mainActivity;
-            this.locationHelper = new LocationHelper(mainActivity);
-        }
-
-        public void queuedRemoveAll() {
-            for (final AirQuality airQuality : airQualities) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeItem(airQuality);
-                    }
-                });
-            }
-        }
-
-        public void queuedAddAll(List<AirQuality> airQualities, long delay) {
-            int count = 0;
-            for (final AirQuality airQuality : airQualities) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        addItem(airQuality);
-                    }
-                }, count++ * delay);
-            }
-        }
-
-        public void addItem(AirQuality airQuality) {
-            airQualities.add(airQuality);
-            int index = airQualities.indexOf(airQuality);
-            notifyItemInserted(index);
-        }
-
-        public void setItem(int position, AirQuality airQuality) {
-            airQualities.set(position, airQuality);
-            notifyItemInserted(position);
-        }
-
-        public AirQuality getItem(int position) {
-            return airQualities.get(position);
-        }
-
-        public boolean removeItem(AirQuality airQuality) {
-            int index = airQualities.indexOf(airQuality);
-            boolean result = airQualities.remove(airQuality);
-            notifyItemRemoved(index);
-            return result;
-        }
-
-        @Override
-        public int getItemCount() {
-            return airQualities.size();
-        }
-
-        /**
-         * Maps a list of time series entiries to their activity dates
-         *
-         * @param activityTimeSeries
-         */
-        public void mapActivityDates(List<TimeSeries> activityTimeSeries) {
-            dateToActivityMap.clear();
-            for (TimeSeries series : activityTimeSeries) {
-                addActivityData(series);
-            }
-            notifyDataSetChanged();
-        }
-
-        /**
-         * Maps a time series entry to it's activity date
-         *
-         * @param activityData
-         * @return
-         */
-        public TimeSeries addActivityData(TimeSeries activityData) {
-            return dateToActivityMap.put(activityData.getDateTime(), activityData);
-        }
-
-        /**
-         * Retrieves a TimeSeries point for this AirQuality's date
-         *
-         * @param key
-         * @return
-         */
-        public TimeSeries forAirQuality(AirQuality key) {
-            return dateToActivityMap.get(getAirQualityDateKey(key));
-        }
-
-        public String getAirQualityDateKey(AirQuality airQuality){
-            return Utils.generateFitbitDateTimeString(airQuality.getCreated_at());
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            AirQuality airQuality = getItem(position);
-            AirQuality.IndexType indexType = airQuality.getIndexType();
-            holder.airQualityBorder.setBackground(new ColorDrawable(holder.itemView.getContext()
-                    .getResources().getColor(indexType.getColor())));
-            holder.activityDateText.setText(Utils.formatDate(airQuality.getDate_observed()));
-
-            TimeSeries activityData = forAirQuality(airQuality);
-            if (activityData != null) {
-                holder.activityTypeText.setText(mainActivity.getString(R.string.running));
-                holder.activityDistanceText.setText(Utils.formatDistance(activityData.getValue()));
-            } else {
-                holder.activityTypeText.setText(mainActivity.getString(R.string.none));
-                holder.activityDistanceText.setText("0");
-            }
-
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = mainActivity.getLayoutInflater();
-            return new ViewHolder(inflater.inflate(R.layout.list_item, parent, false));
-        }
     }
 
+    @Override
+    public void onItemPinned(int position) {
 
+    }
+
+    @Override
+    public void onItemViewClicked(MainActivityAdapter.ViewHolder v, int viewId, boolean pinned) {
+        try {
+            if (pinned) {
+                TextView locationButton = (TextView) v.itemView.findViewById(viewId);
+                EpaActivity.Location mLocation = EpaActivity.Location.valueOf(locationButton.getText().toString());
+                postActivityForCurrentPlace(mLocation);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }

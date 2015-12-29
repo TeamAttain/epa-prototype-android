@@ -62,6 +62,7 @@ public class AirQuality {
     private final String zip_code;
     private final String created_at;
     private final String updated_at;
+    private transient IndexType indexType;
 
     public AirQuality(long id, int aqi, String category, String date_observed, int hour_observed, double lat,
                       String local_time_zone, double lng, String parameter_name, String reporting_area, String state_code, String zip_code, String created_at, String updated_at) {
@@ -138,6 +139,9 @@ public class AirQuality {
     }
 
     public IndexType getIndexType() {
-        return IndexType.forIndexRange(getAqi());
+        if(indexType == null){
+            indexType = IndexType.forIndexRange(getAqi());
+        }
+        return indexType;
     }
 }
