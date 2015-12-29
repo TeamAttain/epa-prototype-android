@@ -20,7 +20,7 @@ import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrateg
  * Created by Austin Lanier on 12/10/15.
  * Updated by
  */
-public class FitbitRequestManager implements FitbitApi, RequestHandler {
+public class FitbitRequestManager implements FitbitApi, RequestHandler<BaseRequest<?>> {
 
     private static NetworkRequestManager delegate;
 

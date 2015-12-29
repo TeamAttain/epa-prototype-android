@@ -35,6 +35,10 @@ public class PreferenceHelper {
         preferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
     }
 
+    public void persistString(String key, String value){
+
+    }
+
     /**
      * Converts the provided object to the json string and stores it in the activity's
      * local shared preferences

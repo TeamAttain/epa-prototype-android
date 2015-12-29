@@ -3,8 +3,6 @@ package com.smashingboxes.epa_prototype_android;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -16,7 +14,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -39,7 +36,6 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.ActivityRecognitionApi;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.smashingboxes.epa_prototype_android.fitbit.FitbitRequestManager;
@@ -54,21 +50,21 @@ import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
 import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivity;
-import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivityDetails;
 import com.smashingboxes.epa_prototype_android.views.DividerItemDecoration;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import jp.wasabeef.recyclerview.animators.LandingAnimator;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
 
     private static final String INFO_LINK_HTML = "<a href=\"%s\">%s</a>";
-
-    /*
-     * Fragment Tags
-     */
-    private static final String TAG_ADD_LOCATION_DIALOG = "com.smashingboxes.epa_prototype_android.TAG_ADD_LOCATION_DIALOG";
 
     /*
      * Application state singleton helpers
@@ -127,14 +118,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final Response.Listener<String> postActivitiesListener  = new Response.Listener<String>() {
+    private final Response.Listener<JSONObject> postActivitiesListener = new Response.Listener<JSONObject>() {
         @Override
-        public void onResponse(String response) {
-
+        public void onResponse(JSONObject response) {
+            Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
         }
     };
 
-    //TODO SUBCLASS
     private final Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
@@ -186,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(activitiesAdapter);
 
         fetchData();
+        showSelectActivityLocationDialog();
     }
 
     private void fetchData() {
@@ -256,8 +247,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onAirQualityReceived(ArrayList<AirQuality> airQualities) {
+        airQualities.clear();
         addFakeDataIfEmpty(airQualities);
-        if(airQualities.size() > 0) {
+        if (airQualities.size() > 0) {
             airQualityList = airQualities;
             setUpHeader(airQualities.get(0));
             activitiesAdapter.queuedRemoveAll(getResources().getInteger(android.R.integer.config_shortAnimTime));
@@ -272,20 +264,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addFakeDataIfEmpty(ArrayList<AirQuality> airQualities){
-        if(airQualities.size() == 0){
+    /**
+     * Generates random AirQuality data to ensure data for demo purposes.
+     *
+     * @param airQualities
+     */
+    private void addFakeDataIfEmpty(ArrayList<AirQuality> airQualities) {
+        if (airQualities.size() == 0) {
             Random random = new Random(System.currentTimeMillis());
-            for(int i = 1; i < 8; i++) {
+            for (int i = 1; i < 8; i++) {
                 int aqi = random.nextInt(500);
                 AirQuality.IndexType indexType = AirQuality.IndexType.forIndexRange(aqi);
                 String now = Utils.formatLong(System.currentTimeMillis());
                 airQualities.add(new AirQuality(i, random.nextInt(500) / i, indexType.getTitle(), now, i,
-                        0, "EST", 0, "", "", "NC", "", now, now));
+                        0, TimeZone.getDefault().getDisplayName(), 0, "", "", "NC", "", now, now));
             }
         }
     }
 
-    private Snackbar makeSnackbar(String title, String actionTitle, View.OnClickListener actionOnClickListener){
+    private Snackbar makeSnackbar(String title, String actionTitle, View.OnClickListener actionOnClickListener) {
         return Snackbar.make(findViewById(R.id.coordinator_container), title, Snackbar.LENGTH_LONG).setAction(actionTitle, actionOnClickListener);
     }
 
@@ -309,31 +306,7 @@ public class MainActivity extends AppCompatActivity {
         }, todaysIndexType.getColor(), toColor).setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
         animator.start();
     }
-
-    private void showSelectActivityLocationDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        final ListView optionsListView = (ListView) getLayoutInflater().inflate(R.layout.listview, null, false);
-        final List<EpaActivity.Location> items = new ArrayList<>(Arrays.asList(EpaActivity.Location.values()));
-        optionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                dismissActivityPrompt();
-                postActivityForCurrentPlace(items.get(position));
-            }
-        });
-        List<String> options = new ArrayList<>(items.size());
-        for (EpaActivity.Location location : items) {
-            options.add(location.name);
-        }
-        ArrayAdapter<String> optionsAdapter = new ArrayAdapter<>(this, R.layout.list_item, options);
-        optionsListView.setAdapter(optionsAdapter);
-        optionsListView.setSelection(0);
-        dialogBuilder.setTitle(R.string.activity_location_selection);
-        dialogBuilder.setView(optionsListView);
-        dialogBuilder.setNegativeButton(R.string.cancel, null);
-        activityLocationDialog = dialogBuilder.show();
-    }
-
+    
     private void postActivityForCurrentPlace(@NonNull EpaActivity.Location location) {
         if (hasSelectedPlace()) {
             SimplePlace currentPlace = appStateManager.getPlace();
@@ -411,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void queuedRemoveAll(long delay) {
             int count = 0;
-            for(final AirQuality airQuality : airQualities){
+            for (final AirQuality airQuality : airQualities) {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -439,11 +412,11 @@ public class MainActivity extends AppCompatActivity {
             notifyItemInserted(index);
         }
 
-        public FitbitActivity addActivityData(AirQuality key, FitbitActivity activityData){
+        public FitbitActivity addActivityData(AirQuality key, FitbitActivity activityData) {
             return activityDataMap.put(key, activityData);
         }
 
-        public FitbitActivity removedActivityData(AirQuality key){
+        public FitbitActivity removedActivityData(AirQuality key) {
             return activityDataMap.remove(key);
         }
 
@@ -452,11 +425,11 @@ public class MainActivity extends AppCompatActivity {
             notifyItemInserted(position);
         }
 
-        public AirQuality getItem(int position){
+        public AirQuality getItem(int position) {
             return airQualities.get(position);
         }
 
-        public boolean removeItem(AirQuality airQuality){
+        public boolean removeItem(AirQuality airQuality) {
             int index = airQualities.indexOf(airQuality);
             boolean result = airQualities.remove(airQuality);
             notifyItemRemoved(index);
@@ -477,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
             holder.activityDateText.setText(Utils.formatDate(airQuality.getDate_observed()));
 
             FitbitActivity activityData = activityDataMap.get(airQuality);
-            if(activityData != null){
+            if (activityData != null) {
                 holder.activityTypeText.setText(activityData.getName());
                 holder.activityDistanceText.setText(Utils.formatDistance(activityData.getDistance()));
             } else {

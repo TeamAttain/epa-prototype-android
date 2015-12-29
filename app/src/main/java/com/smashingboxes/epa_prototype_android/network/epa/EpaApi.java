@@ -45,7 +45,7 @@ public interface EpaApi {
      * @param activitiesListener
      * @param errorListener
      */
-    void postActivities(List<EpaActivity> activities, Response.Listener<String> activitiesListener, Response.ErrorListener errorListener);
+    void postActivities(List<EpaActivity> activities, Response.Listener<JSONObject> activitiesListener, Response.ErrorListener errorListener);
 
 
 }
