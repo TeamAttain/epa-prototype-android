@@ -6,7 +6,7 @@ package com.smashingboxes.epa_prototype_android.fitbit.activity;
  *
  * @see https://dev.fitbit.com/docs/activity/#activity-time-series
  */
-public enum TimeSeriesResourcePath {
+public enum ActivityResourcePath {
     CALORIES("calories"), CALORIES_BMR("caloriesBMR"), STEPS("steps"),
     DISTANCE("distance"), FLOORS("floors"), EVEVATION("elevation"),
     MINUTES_SEDENTARY("minutesSedentary"), MINUTES_LIGHTLY_ACTIVE("minutesLightlyActive"),
@@ -17,7 +17,7 @@ public enum TimeSeriesResourcePath {
 
     private final String path;
 
-    TimeSeriesResourcePath(String path) {
+    ActivityResourcePath(String path) {
         this.path = path;
     }
 
