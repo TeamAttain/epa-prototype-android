@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class EpaActivity {
 
     public enum Location {
-        INSIDE("inside"), OUTSIDE("outside");
+        INSIDE("inside"), OUTSIDE("outside"), NONE("none");
 
         public final String name;
 

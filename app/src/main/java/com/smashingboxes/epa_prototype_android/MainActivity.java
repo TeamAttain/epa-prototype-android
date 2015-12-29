@@ -41,10 +41,10 @@ import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
-import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitActivity;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
 import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
 import com.smashingboxes.epa_prototype_android.fitbit.settings.SettingsActivity;
+import com.smashingboxes.epa_prototype_android.helpers.LocationHelper;
 import com.smashingboxes.epa_prototype_android.helpers.Utils;
 import com.smashingboxes.epa_prototype_android.network.epa.EpaRequestManager;
 import com.smashingboxes.epa_prototype_android.network.epa.models.AirQuality;
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final Response.Listener<ArrayList<TimeSeries>> activityTimeSeriesListener = new Response.Listener<ArrayList<TimeSeries>>(){
+    private final Response.Listener<ArrayList<TimeSeries>> activityTimeSeriesListener = new Response.Listener<ArrayList<TimeSeries>>() {
         @Override
         public void onResponse(ArrayList<TimeSeries> response) {
             activitiesAdapter.mapActivityDates(response);
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void getUserActivityTimeSeries(){
+    private void getUserActivityTimeSeries() {
         fitbitRequestManager.getCurrentUserTimeSeriesTrackerData(selectedResourcePath, Period._6M, activityTimeSeriesListener, errorListener);
     }
 
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         }, todaysIndexType.getColor(), toColor).setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
         animator.start();
     }
-    
+
     private void postActivityForCurrentPlace(@NonNull EpaActivity.Location location) {
         if (hasSelectedPlace()) {
             SimplePlace currentPlace = appStateManager.getPlace();
@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public ActivityResourcePath getSelectedResourcePath(){
+    public ActivityResourcePath getSelectedResourcePath() {
         return selectedResourcePath;
     }
 
@@ -400,10 +400,12 @@ public class MainActivity extends AppCompatActivity {
         private MainActivity mainActivity;
         private List<AirQuality> airQualities = new ArrayList<>();
         private Map<String, TimeSeries> dateToActivityMap = new HashMap<>();
+        private LocationHelper locationHelper;
         private Handler handler = new Handler();
 
         public MainActivityAdapter(@NonNull MainActivity mainActivity) {
             this.mainActivity = mainActivity;
+            this.locationHelper = new LocationHelper(mainActivity);
         }
 
         public void queuedRemoveAll() {
@@ -461,9 +463,9 @@ public class MainActivity extends AppCompatActivity {
          *
          * @param activityTimeSeries
          */
-        public void mapActivityDates(List<TimeSeries> activityTimeSeries){
+        public void mapActivityDates(List<TimeSeries> activityTimeSeries) {
             dateToActivityMap.clear();
-            for(TimeSeries series : activityTimeSeries){
+            for (TimeSeries series : activityTimeSeries) {
                 addActivityData(series);
             }
             notifyDataSetChanged();
@@ -486,7 +488,11 @@ public class MainActivity extends AppCompatActivity {
          * @return
          */
         public TimeSeries forAirQuality(AirQuality key) {
-            return dateToActivityMap.get(Utils.generateFitbitDateTimeString(key.getCreated_at()));
+            return dateToActivityMap.get(getAirQualityDateKey(key));
+        }
+
+        public String getAirQualityDateKey(AirQuality airQuality){
+            return Utils.generateFitbitDateTimeString(airQuality.getCreated_at());
         }
 
         @Override
