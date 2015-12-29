@@ -31,6 +31,9 @@
 	<!-- Snackbars and Dialogs -->
 	<string name="error_no_location">Please select a location.</string>
 	<string name="add_location">Add Location</string>
+	<string name="error_retrieving_data">Error retrieving data from the network.</string>
+	<string name="error_no_air_quality_data">Failed to retrieve air quality data for your area.</string>
+	<string name="try_again">Try again</string>
 
 	<!-- MainActivity -->
 	<string name="play_services_repairable">Google Play Services currently unavailable.  Please check your connection.</string>

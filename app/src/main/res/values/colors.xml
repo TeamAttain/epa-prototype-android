@@ -15,5 +15,7 @@
 	<color name="air_very_unhealthy">#a41849</color>
 	<color name="air_hazardous">#a41849</color>
 
+	<color name="trans_white_medium_dark">#60FFFFFF</color>
+	<color name="trans_white_dark">#90FFFFFF</color>
 
 </resources>

@@ -3,6 +3,7 @@ package com.smashingboxes.epa_prototype_android;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -60,6 +61,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -135,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
     /*
      * UI Elements
      */
+    @Bind(R.id.air_quality_today_info_container)
+    View todayInfoContainerView;
     @Bind(R.id.air_quality_title)
     TextView headerTitle;
     @Bind(R.id.air_quality_info_link)
@@ -168,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setItemAnimator(new SlideInLeftAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         activitiesAdapter = new MainActivityAdapter(this);
         recyclerView.setAdapter(activitiesAdapter);
@@ -243,16 +247,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onAirQualityReceived(ArrayList<AirQuality> airQuality) {
-        airQualityList = airQuality;
-        setUpHeader(airQuality.get(0));
-        activitiesAdapter.queuedRemoveAll();
-        activitiesAdapter.queuedAddAll(airQuality);
+        if(airQuality.size() > 0) {
+            airQualityList = airQuality;
+            setUpHeader(airQuality.get(0));
+            activitiesAdapter.queuedRemoveAll();
+            activitiesAdapter.queuedAddAll(airQuality, getResources().getInteger(android.R.integer.config_shortAnimTime));
+        } else {
+            Snackbar snackbar = makeSnackbar(getString(R.string.error_no_air_quality_data), getString(R.string.try_again), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fetchData();
+                }
+            });
+            snackbar.show();
+        }
+    }
+
+    private Snackbar makeSnackbar(String title, String actionTitle, View.OnClickListener actionOnClickListener){
+        return Snackbar.make(findViewById(R.id.coordinator_container), title, Snackbar.LENGTH_LONG).setAction(actionTitle, actionOnClickListener);
     }
 
     private void setUpHeader(AirQuality airQuality) {
         AirQuality.IndexType indexType = airQuality.getIndexType();
         headerTitle.setText(indexType.getTitle());
         LayerDrawable background = (LayerDrawable) headerBackgroundColor.getBackground();
+        todayInfoContainerView.animate().alpha(1).setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
         animateBackgroundDrawable((GradientDrawable) background.getDrawable(0), getResources().getColor(indexType.getColor()));
         mCollapsingToolbarLayout.setContentScrim(new ColorDrawable(getResources().getColor(indexType.getColor())));
     }
@@ -375,14 +394,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        public void queuedAddAll(List<AirQuality> airQualities) {
+        public void queuedAddAll(List<AirQuality> airQualities, long delay) {
+            int count = 0;
             for (final AirQuality airQuality : airQualities) {
-                handler.post(new Runnable() {
+                handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         addItem(airQuality);
                     }
-                });
+                }, count++ * delay);
             }
         }
 
