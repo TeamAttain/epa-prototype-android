@@ -80,6 +80,18 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         return airQualities.get(position).getId();
     }
 
+    public ArrayList<AirQuality> getAirQualityList(){
+        return new ArrayList<>(airQualities);
+    }
+
+    public ArrayList<TimeSeries> getTimeSeriesList(){
+        ArrayList<TimeSeries> timeSeries = new ArrayList<>();
+        for(String key : dateToActivityMap.keySet()){
+            timeSeries.add(dateToActivityMap.get(key));
+        }
+        return timeSeries;
+    }
+
     public void queuedRemoveAll() {
         for (final AirQuality airQuality : airQualities) {
             handler.post(new Runnable() {
