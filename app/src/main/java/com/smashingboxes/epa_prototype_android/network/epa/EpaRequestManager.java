@@ -5,6 +5,8 @@ import android.content.Context;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.google.gson.Gson;
 import com.smashingboxes.epa_prototype_android.fitbit.location.SimplePlace;
 import com.smashingboxes.epa_prototype_android.network.NetworkRequestManager;
@@ -17,6 +19,8 @@ import com.smashingboxes.epa_prototype_android.network.epa.models.EpaActivityDet
 import com.smashingboxes.epa_prototype_android.network.parsing.ArrayParseStrategy;
 import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +28,7 @@ import java.util.List;
  * Created by Austin Lanier on 12/17/15.
  * Updated by
  */
-public class EpaRequestManager implements EpaApi, RequestHandler {
+public class EpaRequestManager implements EpaApi, RequestHandler<Request<?>> {
 
     private static NetworkRequestManager delegate;
     private static Gson gson = new Gson();
@@ -42,7 +46,7 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
     }
 
     @Override
-    public void addRequest(BaseRequest<?> request, Object tag) {
+    public void addRequest(Request<?> request, Object tag) {
         request.setRetryPolicy(retryPolicy);
         delegate.addRequest(request, tag);
     }
@@ -74,12 +78,12 @@ public class EpaRequestManager implements EpaApi, RequestHandler {
     }
 
     @Override
-    public void postActivities(List<EpaActivity> activities, Response.Listener<String> activitiesListener, Response.ErrorListener errorListener) {
+    public void postActivities(List<EpaActivity> activities, Response.Listener<JSONObject> activitiesListener, Response.ErrorListener errorListener) {
+        String url = EpaUrlGenerator.getActivtiesUrl();
         ActivityPostRequest requestBody = new ActivityPostRequest(activities);
         String myJsonRequestBody = gson.toJson(requestBody);
-        BaseRequest<String> objectRequest = new BaseRequest<>(Request.Method.POST, EpaUrlGenerator.getActivtiesUrl(),
-                activitiesListener, errorListener, BaseRequest.NO_PARSE_STRAT);
-        objectRequest.setRequestBody(myJsonRequestBody.getBytes());
+        JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.POST, url,
+                myJsonRequestBody, activitiesListener, errorListener);
         addRequest(objectRequest, cancelTag);
     }
 

@@ -3,9 +3,10 @@ package com.smashingboxes.epa_prototype_android.fitbit.auth;
 import android.content.Context;
 import android.content.Intent;
 
+import com.smashingboxes.epa_prototype_android.AppStateManager;
 import com.smashingboxes.epa_prototype_android.LoginActivity;
-import com.smashingboxes.epa_prototype_android.helpers.PreferenceHelper;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
+import com.smashingboxes.epa_prototype_android.helpers.PreferenceHelper;
 
 /**
  * Created by Austin Lanier on 12/8/15.
@@ -60,12 +61,17 @@ public class FitbitLoginCache {
     }
 
     public static void logout(Context context) {
-        FitbitLoginCache.getInstance(context).clearLogin();
+        resetAppState(context);
 
         Intent intent = new Intent(context, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setAction(LoginActivity.ACTION_LOGOUT);
         context.startActivity(intent);
+    }
+
+    public static void resetAppState(Context context) {
+        FitbitLoginCache.getInstance(context).clearLogin();
+        AppStateManager.getInstance(context).clear();
     }
 
 }

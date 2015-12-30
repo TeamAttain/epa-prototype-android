@@ -36,5 +36,12 @@ public class FitbitUrlGenerator {
         return String.format("%s/%s/date/%s/%s.json", getUserPath(userId), resource_path, start, end);
     }
 
+    /**
+     * Get Activity Logs List
+     */
+    public static String getActivityLogList(String userId){
+        return String.format("%s/activities/list.json", getUserPath(userId));
+    }
+
 
 }

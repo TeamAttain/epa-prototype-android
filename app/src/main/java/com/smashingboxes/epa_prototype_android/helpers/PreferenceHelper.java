@@ -35,6 +35,22 @@ public class PreferenceHelper {
         preferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
     }
 
+    public void persistStringAsync(String key, String value){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    public void persistStringSync(String key, String value){
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public String getString(String key, String defaultValue){
+        return preferences.getString(key, defaultValue);
+    }
+
     /**
      * Converts the provided object to the json string and stores it in the activity's
      * local shared preferences
@@ -43,15 +59,11 @@ public class PreferenceHelper {
      * @param object - the object to persist
      */
     public void persistObjectAsync(String key, Object object) {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(key, gson.toJson(object));
-        editor.apply();
+        persistStringAsync(key, gson.toJson(object));
     }
 
     public void persistObjectSync(String key, Object object){
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(key, gson.toJson(object));
-        editor.commit();
+        persistStringSync(key, gson.toJson(object));
     }
 
     /**
@@ -63,6 +75,10 @@ public class PreferenceHelper {
         preferences.edit().remove(key).apply();
     }
 
+    public void clear(){
+        preferences.edit().clear().apply();
+    }
+
     /**
      * @param key   - the key to of the preference to retrieve
      * @param clazz - the class of the returned object type
@@ -71,7 +87,7 @@ public class PreferenceHelper {
     public <T> T getObject(String key, Class<T> clazz) {
         T t = null;
         try {
-            String objectAsJson = preferences.getString(key, null);
+            String objectAsJson = getString(key, null);
             t = gson.fromJson(objectAsJson, clazz);
         } catch (Exception e) {
             e.printStackTrace();

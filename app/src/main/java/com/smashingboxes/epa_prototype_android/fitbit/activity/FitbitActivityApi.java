@@ -2,6 +2,9 @@ package com.smashingboxes.epa_prototype_android.fitbit.activity;
 
 import com.android.volley.Response;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
+import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
+
+import java.util.ArrayList;
 
 /**
  * Created by Austin Lanier on 12/15/15.
@@ -45,12 +48,12 @@ public interface FitbitActivityApi {
      *
      * @param userId
      * @param resourcePath
-     * @param date
-     * @param period
+     * @param start - RequestKeys.TODAY or yyyy-MM-dd
+     * @param end - Period or yyyy-MM-dd
      * @param responseListener
      * @param errorListener
      */
-    void getUserTimeSeriesTrackerData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
+    void getUserTimeSeriesTrackerData(String userId, ActivityResourcePath resourcePath, String start, String end, Response.Listener<ArrayList<TimeSeries>> responseListener, Response.ErrorListener errorListener);
 
     /**
      * GET /1/user/-/[resource-path]/date/[base-date]/[end-date].json
@@ -59,11 +62,10 @@ public interface FitbitActivityApi {
      * for the current user
      *
      * @param resourcePath
-     * @param date
      * @param period
      * @param responseListener
      * @param errorListener
      */
-    void getCurrentUserTimeSeriesTrackerData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener);
+    void getCurrentUserTimeSeriesTrackerData(ActivityResourcePath resourcePath, Period period, Response.Listener<ArrayList<TimeSeries>> responseListener, Response.ErrorListener errorListener);
 
 }

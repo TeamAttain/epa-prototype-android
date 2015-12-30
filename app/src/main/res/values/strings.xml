@@ -13,16 +13,21 @@
 	<string name="fitbit_scheme">fitbitepaauth</string>
 	<string name="fitbit_host">com.smashingboxes.epa_prototype_android</string>
 	<string name="fitbit_path">/fitbit</string>
+	<string name="running">Running</string>
 
 	<!-- Location -->
+	<string name="inside">INSIDE</string>
+	<string name="inside_lower">Inside</string>
+	<string name="outside">OUTSIDE</string>
+	<string name="outside_lower">Outside</string>
+
 	<!-- Permissions -->
 	<string name="permission_location_title">Permission Request</string>
 	<string name="permission_location_msg">%s would like to access your location for accessing air quality data related to your area.</string>
 	<string name="permission_location_denied">Location permission denied</string>
 	<string name="select_location">Select Location</string>
 	<string name="activity_location_selection">Select Activity Location</string>
-	<string name="swipe_to_add_activity">Swipe to\nadd Activity</string>
-	<string name="swipe_to_edit_activity">Swipe to\nedit Activity</string>
+	<string name="swipe_to_add_location">Swipe to\nadd Location</string>
 
 	<!-- General -->
 	<string name="logout">Logout</string>

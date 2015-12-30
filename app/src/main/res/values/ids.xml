@@ -7,6 +7,7 @@
 	<item name="web_view" type="id"/>
 	<item name="menu_logout" type="id"/>
 	<item name="menu_settings" type="id"/>
+	<item name="menu_select_location" type="id"/>
 	<item name="user_image" type="id"/>
 	<item name="user_details_container" type="id"/>
 	<item name="sign_in_button" type="id"/>
@@ -19,5 +20,9 @@
 	<item name="air_quality_title" type="id"/>
 	<item name="air_quality_info_link" type="id"/>
 	<item name="air_quality_today_info_container" type="id"/>
+	<item name="swipe_container" type="id"/>
+	<item name="activity_inside" type="id"/>
+	<item name="activity_outside" type="id"/>
+
 
 </resources>

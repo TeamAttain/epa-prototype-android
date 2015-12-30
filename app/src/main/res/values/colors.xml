@@ -3,6 +3,7 @@
 	<color name="colorPrimary">@color/splash_blue</color>
 	<color name="colorPrimaryDark">#000000</color>
 	<color name="colorAccent">#a9b6c2</color>
+	<color name="colorListPressed">#e1e3e6</color>
 	<color name="colorLightPrimary">@color/white</color>
 
 	<color name="white">#ffffff</color>

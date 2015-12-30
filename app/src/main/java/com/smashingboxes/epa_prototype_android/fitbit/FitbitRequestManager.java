@@ -4,23 +4,28 @@ import android.content.Context;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.smashingboxes.epa_prototype_android.fitbit.activity.ActivityResourcePath;
 import com.smashingboxes.epa_prototype_android.fitbit.activity.Period;
-import com.smashingboxes.epa_prototype_android.fitbit.activity.TimeSeriesResourcePath;
 import com.smashingboxes.epa_prototype_android.fitbit.auth.FitbitLoginCache;
 import com.smashingboxes.epa_prototype_android.fitbit.models.ActivityData;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitAuthModel;
 import com.smashingboxes.epa_prototype_android.fitbit.models.FitbitProfile;
-import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
-import com.smashingboxes.epa_prototype_android.network.requests.ForceCacheRequest;
+import com.smashingboxes.epa_prototype_android.fitbit.models.TimeSeries;
 import com.smashingboxes.epa_prototype_android.network.NetworkRequestManager;
 import com.smashingboxes.epa_prototype_android.network.RequestHandler;
+import com.smashingboxes.epa_prototype_android.network.RequestKeys;
+import com.smashingboxes.epa_prototype_android.network.parsing.ArrayParseStrategy;
 import com.smashingboxes.epa_prototype_android.network.parsing.ClassParseStrategy;
+import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
+import com.smashingboxes.epa_prototype_android.network.requests.ForceCacheRequest;
+
+import java.util.ArrayList;
 
 /**
  * Created by Austin Lanier on 12/10/15.
  * Updated by
  */
-public class FitbitRequestManager implements FitbitApi, RequestHandler {
+public class FitbitRequestManager implements FitbitApi, RequestHandler<BaseRequest<?>> {
 
     private static NetworkRequestManager delegate;
 
@@ -85,15 +90,15 @@ public class FitbitRequestManager implements FitbitApi, RequestHandler {
     }
 
     @Override
-    public void getUserTimeSeriesTrackerData(String userId, TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
-        String url = FitbitUrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getTrackerPath(), date, period.durationKey);
-        BaseRequest<String> getTimeSeriesData = new ForceCacheRequest<>(Request.Method.GET, url, responseListener,
-                errorListener, BaseRequest.NO_PARSE_STRAT);
+    public void getUserTimeSeriesTrackerData(String userId, ActivityResourcePath resourcePath, String start, String end, Response.Listener<ArrayList<TimeSeries>> responseListener, Response.ErrorListener errorListener) {
+        String url = FitbitUrlGenerator.getActivityTimeSeriesUrl(userId, resourcePath.getFullPath(), start, end);
+        BaseRequest<ArrayList<TimeSeries>> getTimeSeriesData = new ForceCacheRequest<>(Request.Method.GET, url, responseListener,
+                errorListener, new ArrayParseStrategy<>(TimeSeries.class, resourcePath.getArrayResponseKey()));
         addRequest(getTimeSeriesData, cancelTag);
     }
 
     @Override
-    public void getCurrentUserTimeSeriesTrackerData(TimeSeriesResourcePath resourcePath, String date, Period period, Response.Listener<String> responseListener, Response.ErrorListener errorListener) {
-        getUserTimeSeriesTrackerData(CURRENT_USER_ID, resourcePath, date, period, responseListener, errorListener);
+    public void getCurrentUserTimeSeriesTrackerData(ActivityResourcePath resourcePath, Period period, Response.Listener<ArrayList<TimeSeries>> responseListener, Response.ErrorListener errorListener) {
+        getUserTimeSeriesTrackerData(CURRENT_USER_ID, resourcePath, RequestKeys.TODAY.getParamValue(), period.durationKey, responseListener, errorListener);
     }
 }

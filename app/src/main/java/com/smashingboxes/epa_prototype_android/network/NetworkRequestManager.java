@@ -2,6 +2,7 @@ package com.smashingboxes.epa_prototype_android.network;
 
 import android.content.Context;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
@@ -10,7 +11,7 @@ import com.smashingboxes.epa_prototype_android.network.requests.BaseRequest;
  * Created by Austin Lanier on 12/8/15.
  * Updated by
  */
-public class NetworkRequestManager implements RequestHandler {
+public class NetworkRequestManager implements RequestHandler<Request<?>> {
 
     private static final NetworkRequestManager mManager = new NetworkRequestManager();
 
@@ -77,7 +78,7 @@ public class NetworkRequestManager implements RequestHandler {
      * @param tag
      */
     @Override
-    public void addRequest(BaseRequest<?> request, Object tag) {
+    public void addRequest(Request<?> request, Object tag) {
         request.setTag(tag);
         getRequestQueue().add(request);
     }

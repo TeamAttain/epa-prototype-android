@@ -32,7 +32,7 @@
 				android:background="@drawable/status_color"
 				android:fitsSystemWindows="true"
 				android:scaleType="centerCrop"
-				app:layout_collapseMode="parallax"/>
+				app:layout_collapseMode="pin"/>
 
 			<LinearLayout
 				android:id="@id/air_quality_today_info_container"
