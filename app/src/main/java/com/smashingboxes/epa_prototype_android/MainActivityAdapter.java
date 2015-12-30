@@ -1,6 +1,7 @@
 package com.smashingboxes.epa_prototype_android;
 
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -199,8 +200,11 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
         EpaActivity.Location location = appStateManager.getLocation(getAirQualityDateKey(airQuality));
         holder.activityLocation.setText(location.titleRes);
-        holder.activityLocation.setTextAppearance(location.style);
-
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            holder.activityLocation.setTextAppearance(location.style);
+        } else {
+            holder.activityLocation.setTextAppearance(mainActivity, location.style);
+        }
     }
 
     @Override
