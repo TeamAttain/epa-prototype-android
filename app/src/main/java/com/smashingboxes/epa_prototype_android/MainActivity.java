@@ -125,7 +125,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private final Response.Listener<JSONObject> postActivitiesListener = new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-            Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+            makeSnackbar(getString(R.string.location_post_success), getString(R.string.done), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {}
+            }).show();
         }
     };
 
