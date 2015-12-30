@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -69,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private static final int PICK_PLACE_REQUEST = 123;
     private static final int REQUEST_CODE_PLAY_SERVICES_ERROR = 124;
 
+    private static final String KEY_EXTRA_AIR_QUALITY_LIST = "com.smashingboxes.epa_prototype_android.KEY_EXTRA_AIR_QUALITY_LIST";
+    private static final String KEY_EXTRA_TIME_SERIES_LIST = "com.smashingboxes.epa_prototype_android.KEY_EXTRA_TIME_SERIES_LIST";
+
     private static final String INFO_LINK_HTML = "<a href=\"%s\">%s</a>";
 
     /*
@@ -88,11 +92,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
      */
     private ActivityData activityData;
     private FitbitProfile userProfile;
-
-    /*
-     * A List of AirQualities ordered from most recent to oldest
-     */
-    private List<AirQuality> airQualityList;
 
     /*
      * Today's last airquality index.  This is used to style the header
@@ -117,14 +116,17 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private final Response.Listener<ArrayList<AirQuality>> airQualityListener = new Response.Listener<ArrayList<AirQuality>>() {
         @Override
         public void onResponse(ArrayList<AirQuality> response) {
-            onAirQualityReceived(response);
+            onAirQualityReceived(response, true);
         }
     };
 
     private final Response.Listener<JSONObject> postActivitiesListener = new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-            Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+            makeSnackbar(getString(R.string.location_post_success), getString(R.string.done), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {}
+            }).show();
         }
     };
 
@@ -138,7 +140,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private final Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            //If we get an AuthFailureError, our Fitbit authorization has expired
+            if(error instanceof AuthFailureError){
+                FitbitLoginCache.logout(MainActivity.this);
+            } else {
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
         }
     };
 
@@ -178,7 +185,22 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         epaRequestManager = new EpaRequestManager(this, this);
 
         initializeSwipeHandling();
-        fetchData();
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(KEY_EXTRA_AIR_QUALITY_LIST) && savedInstanceState.containsKey(KEY_EXTRA_TIME_SERIES_LIST)) {
+            ArrayList<AirQuality> airQualityList = savedInstanceState.getParcelableArrayList(KEY_EXTRA_AIR_QUALITY_LIST);
+            ArrayList<TimeSeries> timeSeriesList = savedInstanceState.getParcelableArrayList(KEY_EXTRA_TIME_SERIES_LIST);
+            onAirQualityReceived(airQualityList, false);
+            activitiesAdapter.mapActivityDates(timeSeriesList);
+        } else {
+            fetchData();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(KEY_EXTRA_AIR_QUALITY_LIST, activitiesAdapter.getAirQualityList());
+        outState.putParcelableArrayList(KEY_EXTRA_TIME_SERIES_LIST, activitiesAdapter.getTimeSeriesList());
+        super.onSaveInstanceState(outState);
     }
 
     private void initializeSwipeHandling() {
@@ -208,6 +230,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         mRecyclerViewTouchActionGuardManager.attachRecyclerView(recyclerView);
         swipeManager.attachRecyclerView(recyclerView);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(activitiesAdapter.getAirQualityList().isEmpty() || activitiesAdapter.getTimeSeriesList().isEmpty()){
+            fetchData();
+        }
     }
 
     private void fetchData() {
@@ -281,11 +311,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         }
     }
 
-    private void onAirQualityReceived(ArrayList<AirQuality> airQualities) {
-        airQualities.clear();
-        addFakeDataIfEmpty(airQualities);
+    private void onAirQualityReceived(ArrayList<AirQuality> airQualities, boolean withFakeData) {
+        //Temporary for now, just for demo purposes because our two data sets don't line up correctly.  EPA data is
+        //spaced out in ~15 minute intervals while fitbit data is spaced out in 24 hour intervals
+        if(withFakeData) {
+            airQualities.clear();
+            addFakeDataIfEmpty(airQualities);
+        }
+
         if (airQualities.size() > 0) {
-            airQualityList = airQualities;
             setUpHeader(airQualities.get(0));
             activitiesAdapter.queuedRemoveAll();
             activitiesAdapter.queuedAddAll(airQualities, getResources().getInteger(android.R.integer.config_shortAnimTime));

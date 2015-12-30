@@ -36,6 +36,8 @@
 	<string name="what_does_this_mean">What does this mean?</string>
 
 	<!-- Snackbars and Dialogs -->
+	<string name="location_post_success">Location Updated</string>
+	<string name="done">Done</string>
 	<string name="error_no_location">Please select a location.</string>
 	<string name="add_location">Add Location</string>
 	<string name="error_retrieving_data">Error retrieving data from the network.</string>

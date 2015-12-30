@@ -1,14 +1,15 @@
 package com.smashingboxes.epa_prototype_android.network.epa.models;
 
-import com.smashingboxes.epa_prototype_android.R;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import java.util.Arrays;
+import com.smashingboxes.epa_prototype_android.R;
 
 /**
  * Created by Austin Lanier on 12/17/15.
  * Updated by
  */
-public class AirQuality {
+public class AirQuality implements Parcelable {
 
     /**
      * Start and end ranges are referenced from {@linkplain http://airnow.gov/index.cfm?action=aqibasics.aqi }
@@ -18,7 +19,7 @@ public class AirQuality {
     public enum IndexType {
         GOOD(0, 50, R.color.air_good), MODERATE(51, 100, R.color.air_moderate), UNHEALTHY_FOR_SENSITIVE_GROUPS(101, 150, R.color.air_unhealthy_for_sensitive),
         UNHEALTHY(151, 200, R.color.air_unhealthy), VERY_UNHEALTHY(201, 300, R.color.air_very_unhealthy), HAZARDOUS(301, 500, R.color.air_hazardous),
-        NONE(-1,-1, R.color.splash_blue);
+        NONE(-1, -1, R.color.splash_blue);
 
         final int startRange, endRange;
         final int color;
@@ -38,11 +39,11 @@ public class AirQuality {
             return IndexType.NONE;
         }
 
-        public int getColor(){
+        public int getColor() {
             return color;
         }
 
-        public String getTitle(){
+        public String getTitle() {
             return name().replace("_", " ");
         }
 
@@ -80,6 +81,11 @@ public class AirQuality {
         this.zip_code = zip_code;
         this.created_at = created_at;
         this.updated_at = updated_at;
+    }
+
+    public AirQuality(Parcel parcel) {
+        this(parcel.readLong(), parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readInt(), parcel.readDouble(), parcel.readString(), parcel.readDouble(), parcel.readString(),
+                parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString());
     }
 
     public long getId() {
@@ -139,9 +145,43 @@ public class AirQuality {
     }
 
     public IndexType getIndexType() {
-        if(indexType == null){
+        if (indexType == null) {
             indexType = IndexType.forIndexRange(getAqi());
         }
         return indexType;
+    }
+
+    public static final Parcelable.Creator<AirQuality> CREATOR
+            = new Parcelable.Creator<AirQuality>() {
+        public AirQuality createFromParcel(Parcel in) {
+            return new AirQuality(in);
+        }
+
+        public AirQuality[] newArray(int size) {
+            return new AirQuality[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getId());
+        dest.writeInt(getAqi());
+        dest.writeString(getCategory());
+        dest.writeString(getDate_observed());
+        dest.writeInt(getHour_observed());
+        dest.writeDouble(getLat());
+        dest.writeString(getLocal_time_zone());
+        dest.writeDouble(getLng());
+        dest.writeString(getParameter_name());
+        dest.writeString(getReporting_area());
+        dest.writeString(getState_code());
+        dest.writeString(getZip_code());
+        dest.writeString(getCreated_at());
+        dest.writeString(getUpdated_at());
     }
 }
