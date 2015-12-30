@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -138,7 +139,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private final Response.ErrorListener errorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            //If we get an AuthFailureError, our Fitbit authorization has expired
+            if(error instanceof AuthFailureError){
+                FitbitLoginCache.logout(MainActivity.this);
+            } else {
+                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+            }
         }
     };
 
